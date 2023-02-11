@@ -17,12 +17,3 @@ export const prisma =
 if (env.NODE_ENV !== "production") {
   global.prisma = prisma;
 }
-
-async function main() {
-  await prisma.wDSUser.create({ data: {
-    name: "Abdul"
-  }})
-  .catch(e => console.error("error creating user"))
-}
-
-await main()
