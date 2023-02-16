@@ -1,31 +1,9 @@
-import { useState } from "react"
 import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
 
-import { api } from "../utils/api";
-
 const Home: NextPage = () => {
-  // const hello = api.example.hello.useQuery({ text: "from tRPC" });
-  // const hello = api.example.hello2.useQuery({ text: "Hello this is my first app using tRPC! "})
-  const [ first, setFirst ] = useState("");
-  const userQuery = api.example.getUser.useQuery({
-    firstName: "Abdul",
-    lastName: "Shabbir",
-    email: "abdulqshabbir@gmail.com"
-  })
-
-  const userMutation = api.example.setUser.useMutation()
-
-  if (userQuery.isError || userQuery.isLoading) {
-    return (
-      <div>
-        Sorry, something went wrong with your query.
-      </div>
-    )
-  }
-
   return (
     <>
       <Head>
@@ -63,15 +41,8 @@ const Home: NextPage = () => {
             </Link>
           </div>
           <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white">
-              {userQuery.isLoading ? "Loading..." : userQuery.data.firstName}
-            </p>
             <AuthShowcase />
           </div>
-          <input type="text" value={first} onChange={e => setFirst(e.target.value)} />
-          <button type="submit" className="bg-white px-10 py-2" onClick={() => {
-            userMutation.mutate({ firstName: first, lastName: "", email: "" })
-          }}>Click</button>
         </div>
       </main>
     </>
@@ -83,16 +54,10 @@ export default Home;
 const AuthShowcase: React.FC = () => {
   const { data: sessionData } = useSession();
 
-  const { data: secretMessage } = api.example.getSecretMessage.useQuery(
-    undefined, // no input
-    { enabled: sessionData?.user !== undefined },
-  );
-
   return (
     <div className="flex flex-col items-center justify-center gap-4">
       <p className="text-center text-2xl text-white">
         {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
-        {secretMessage && <span> - {secretMessage}</span>}
       </p>
       <button
         className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
