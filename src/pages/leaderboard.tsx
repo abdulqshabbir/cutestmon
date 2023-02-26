@@ -2,7 +2,8 @@ import { trpc } from "../utils/api"
 import Table from "../components/ui/Table"
 
 export default function Leaderboard() {
-  const { isLoading, isError, data, error } = trpc.pokemons.getAllPokemons.useQuery()
+  const { isLoading, isError, data, error } =
+    trpc.pokemons.getAllPokemons.useQuery()
   if (isLoading) {
     return "Loading..."
   }
@@ -17,6 +18,10 @@ export default function Leaderboard() {
     pointsFor: i
   }))
 
-
-  return <Table data={pokemons} columns={["rank", "pointsFor", "name", "image"]}/>
+  return (
+    <Table
+      data={pokemons}
+      columns={["rank", "pointsFor", "name", "image"]}
+    />
+  )
 }
