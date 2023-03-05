@@ -1,60 +1,46 @@
 import { nanoid } from "nanoid"
+import { type ReactNode } from "react"
 
-interface TableProps<Row, Col extends keyof Row> {
-  data: Array<Row>
-  columns: Array<Col>
+// type StringKeys<T> = Extract<T, string>
+
+export interface ColumnType<Row, ColKey extends keyof Row> {
+  key: ColKey
+  width: string | number
+  header: string
 }
 
-export default function Table<Row, Col extends keyof Row>(
-  props: TableProps<Row, Col>
+interface TableProps<Row, ColKey extends keyof Row> {
+  data: Array<Row>
+  columns: Array<ColumnType<Row, ColKey>>
+}
+
+export default function Table<Row, ColKey extends keyof Row>(
+  props: TableProps<Row, ColKey>
 ) {
   return (
     <table>
-      <TableHeader<Row, Col> columns={props.columns} />
-      <TableBody<Row, Col>
-        data={props.data}
-        columns={props.columns}
-      />
-    </table>
-  )
-}
-
-interface TableHeaderProps<Row, Col extends keyof Row> {
-  columns: Array<Col>
-}
-
-function TableHeader<Row, Col extends keyof Row>({
-  columns
-}: TableHeaderProps<Row, Col>) {
-  return (
-    <thead>
-      <tr>
-        {columns.map((col) => (
-          <th key={nanoid()}>{col as string}</th>
-        ))}
-      </tr>
-    </thead>
-  )
-}
-
-interface TableBodyProps<Row, Col extends keyof Row> {
-  data: Array<Row>
-  columns: Array<Col>
-}
-
-function TableBody<Row, Col extends keyof Row>(
-  props: TableBodyProps<Row, Col>
-) {
-  // console.log("data", data)
-  return (
-    <tbody>
-      {props.data.map((row) => (
-        <tr key={nanoid()}>
+      <thead className="h-[50px]">
+        <tr className=" rounded-t-lg bg-gray-200 text-gray-500">
           {props.columns.map((col) => (
-            <td key={nanoid()}>{row[col] as React.ReactNode}</td>
+            <td
+              key={col.header}
+              width={col.width}
+              className="border"
+            >
+              {col.header}
+            </td>
           ))}
         </tr>
-      ))}
-    </tbody>
+      </thead>
+      <tbody>
+        {props.data.map((row) => (
+          <tr key={nanoid()}>
+            {props.columns.map((col) => (
+              <td key={col.key.toString()}>{row[col.key] as ReactNode}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   )
 }
