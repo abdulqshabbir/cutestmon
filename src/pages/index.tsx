@@ -7,6 +7,8 @@ import { AiOutlineBarChart } from "react-icons/ai"
 import { trpc } from "../utils/api"
 import PokemonCard from "../components/ui/PokemonCard"
 
+//test supabase
+
 const Home: NextPage = () => {
   const { data, isError, isLoading } =
     trpc.pokemons.getTwoRandomPokemons.useQuery(undefined, {
