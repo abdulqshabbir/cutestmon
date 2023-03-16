@@ -1,10 +1,20 @@
 import { trpc } from "../utils/api"
 import { nanoid } from "nanoid"
 import Image from "next/image"
+import { type CSSProperties } from "react"
+
+interface Column {
+  key: string
+  width: string
+  header: string
+  styles?: CSSProperties
+}
 
 export default function Leaderboard() {
-  const { isLoading, isError, data, error } =
-    trpc.pokemons.getAllPokemons.useQuery(undefined, { retry: false })
+  const { isLoading, isError, data, error } = trpc.pokemons.all.useQuery(
+    undefined,
+    { retry: false }
+  )
   if (isLoading) {
     return "Loading..."
   }
@@ -19,7 +29,7 @@ export default function Leaderboard() {
     pointsFor: i
   }))
 
-  const columns = [
+  const columns: Column[] = [
     {
       key: "rank",
       width: "20%",
@@ -31,9 +41,9 @@ export default function Leaderboard() {
       header: "Name"
     },
     {
-      key: "pointsFor",
+      key: "votes",
       width: "30%",
-      header: "Points"
+      header: "Votes"
     }
   ]
 
@@ -69,7 +79,7 @@ export default function Leaderboard() {
                 />
                 <p>{pokemon.name}</p>
               </td>
-              <td className="text-center">{pokemon.pointsFor}</td>
+              <td className="text-center">{pokemon.votes}</td>
             </tr>
           ))}
         </tbody>

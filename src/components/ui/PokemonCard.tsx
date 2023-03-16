@@ -24,7 +24,7 @@ export default function PokemonCard({
   useEffect(() => {
     setHasVotedForThisPokemon(false)
   }, [hasCastVote])
-  const mutation = trpc.pokemons.voteForPokemonById.useMutation({
+  const mutation = trpc.pokemons.voteById.useMutation({
     onSuccess() {
       console.log("we voted!")
       setHasCastVote(true)

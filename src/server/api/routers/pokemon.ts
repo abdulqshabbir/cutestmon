@@ -9,42 +9,31 @@ import { prisma } from "../../db"
 const pokemonSchema = z.object({
   image: z.string(),
   name: z.string(),
-  id: z.number()
+  id: z.number(),
+  votes: z.number().optional()
 })
 
 const getAllPokemonsOutput = pokemonSchema.array()
 const getTwoRandomPokemons = pokemonSchema.array()
 
 export const pokemonRouter = createTRPCRouter({
-  getAllPokemons: publicProcedure
-    .output(getAllPokemonsOutput)
-    .query(async () => {
-      const urls = getPokemonUrls()
-      const res = (await Promise.all([
-        ...urls.map((url) => fetch(url).then((response) => response.json()))
-      ])) as z.infer<typeof pokemonAPI>[]
+  all: publicProcedure.output(getAllPokemonsOutput).query(async () => {
+    const pokemons = await prisma.pokemon.findMany()
+    return pokemons
+  }),
+  twoRandom: publicProcedure.output(getTwoRandomPokemons).query(async () => {
+    const urls = getTwoRandomPokemonUrls()
+    const res = (await Promise.all([
+      ...urls.map((url) => fetch(url).then((res) => res.json()))
+    ])) as z.infer<typeof pokemonAPI>[]
 
-      return res.map((pokemon) => ({
-        name: pokemon?.name,
-        image: pokemon?.sprites?.other?.["official-artwork"]?.front_default,
-        id: pokemon?.id
-      }))
-    }),
-  getTwoRandomPokemons: publicProcedure
-    .output(getTwoRandomPokemons)
-    .query(async () => {
-      const urls = getTwoRandomPokemonUrls()
-      const res = (await Promise.all([
-        ...urls.map((url) => fetch(url).then((res) => res.json()))
-      ])) as z.infer<typeof pokemonAPI>[]
-
-      return res.map((pokemon) => ({
-        name: pokemon?.name,
-        image: pokemon.sprites.other?.["official-artwork"]?.front_default,
-        id: pokemon.id
-      }))
-    }),
-  voteForPokemonById: publicProcedure
+    return res.map((pokemon) => ({
+      name: pokemon?.name,
+      image: pokemon.sprites.other?.["official-artwork"]?.front_default,
+      id: pokemon.id
+    }))
+  }),
+  voteById: publicProcedure
     .input(pokemonSchema)
     .output(pokemonSchema)
     .mutation(async (req) => {
@@ -78,14 +67,6 @@ export const pokemonRouter = createTRPCRouter({
       }
     })
 })
-
-function getPokemonUrls() {
-  const pokemonUrls: string[] = []
-  for (let i = 1; i <= 150; i++) {
-    pokemonUrls.push(`https://pokeapi.co/api/v2/pokemon/${i}`)
-  }
-  return pokemonUrls
-}
 
 function getTwoRandomPokemonUrls() {
   const pokemonUrls: string[] = []

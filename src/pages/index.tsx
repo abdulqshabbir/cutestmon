@@ -10,14 +10,15 @@ import PokemonCard from "../components/ui/PokemonCard"
 //test supabase
 
 const Home: NextPage = () => {
-  const { data, isError, isLoading } =
-    trpc.pokemons.getTwoRandomPokemons.useQuery(undefined, {
-      queryKey: ["pokemons.getTwoRandomPokemons", undefined],
-      retry: false,
+  const { data, isError, isLoading, isRefetching } =
+    trpc.pokemons.twoRandom.useQuery(undefined, {
+      queryKey: ["pokemons.twoRandom", undefined],
+      retry: 3,
       refetchOnWindowFocus: false
     })
 
   const [hasCastVote, setHasCastVote] = useState(false)
+  const invalidator = trpc.useContext().pokemons.twoRandom
 
   if (isError) {
     return <div>Sorry something went wrong</div>
@@ -39,7 +40,7 @@ const Home: NextPage = () => {
           <PokemonCard
             name={data?.[0]?.name}
             imageUrl={data?.[0]?.image}
-            isLoading={isLoading}
+            isLoading={isLoading || isRefetching}
             id={data?.[0]?.id}
             setHasCastVote={setHasCastVote}
             hasCastVote={hasCastVote}
@@ -47,7 +48,7 @@ const Home: NextPage = () => {
           <PokemonCard
             name={data?.[1]?.name}
             imageUrl={data?.[1]?.image}
-            isLoading={isLoading}
+            isLoading={isLoading || isRefetching}
             id={data?.[0]?.id}
             setHasCastVote={setHasCastVote}
             hasCastVote={hasCastVote}
@@ -61,7 +62,13 @@ const Home: NextPage = () => {
               }}
               className="flex items-center justify-center gap-2 rounded-lg bg-purple-200 py-4 px-8 text-gray-600 transition-all hover:scale-110 "
             >
-              <span>Vote Again</span>
+              <span
+                onClick={() => {
+                  invalidator.invalidate().catch(console.error)
+                }}
+              >
+                Vote Again
+              </span>
               <VscRefresh />
             </button>
             <button className=" flex items-center justify-center gap-2 rounded-lg bg-green-200 py-4 px-8 text-gray-600 transition-all hover:scale-110">
