@@ -18,7 +18,13 @@ const getTwoRandomPokemons = pokemonSchema.array()
 
 export const pokemonRouter = createTRPCRouter({
   all: publicProcedure.output(getAllPokemonsOutput).query(async () => {
-    const pokemons = await prisma.pokemon.findMany()
+    const pokemons = await prisma.pokemon.findMany({
+      orderBy: [
+        {
+          votes: "desc"
+        }
+      ]
+    })
     return pokemons
   }),
   twoRandom: publicProcedure.output(getTwoRandomPokemons).query(async () => {

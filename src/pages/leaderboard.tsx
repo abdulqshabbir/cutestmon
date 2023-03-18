@@ -33,30 +33,35 @@ export default function Leaderboard() {
     {
       key: "rank",
       width: "20%",
-      header: "Place"
+      header: "Rank"
     },
     {
       key: "name",
-      width: "50%",
+      width: "60%",
       header: "Name"
     },
     {
       key: "votes",
-      width: "30%",
+      width: "20%",
       header: "Votes"
     }
   ]
 
   return (
-    <div className=" mx-auto mt-8 max-w-2xl">
+    <div className="mx-auto mt-8 max-w-md text-gray-500">
+      <div className="mb-2 flex justify-between">
+        <h1 className="text-lg font-semibold italic">
+          Sharpest Pokemon Ranking
+        </h1>
+      </div>
       <table className="w-full">
-        <thead className="border-b-1 h-[50px]">
+        <thead className="h-[30px] border-b-[1px]">
           <tr>
             {columns.map((col) => (
               <td
                 key={col.header}
                 width={col.width}
-                className="text-center"
+                className="p-2 pb-1"
               >
                 {col.header}
               </td>
@@ -64,22 +69,24 @@ export default function Leaderboard() {
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-gray-100">
-          {pokemons.map((pokemon) => (
+          {pokemons.map((pokemon, i) => (
             <tr
               key={nanoid()}
-              className=" min-w-[800px]"
+              className="my-auto h-20 min-w-[800px]"
             >
-              <td className="w-[20%] text-center">{pokemon.rank}</td>
-              <td className="flex items-center justify-center gap-4">
-                <Image
-                  src={pokemon.image}
-                  width={75}
-                  height={75}
-                  alt="Pokemon avatar"
-                />
+              <td className="w-[20%] pl-6">{i + 1}</td>
+              <td className="pl flex h-20 items-center justify-start gap-4">
+                <div className="rounded-full bg-gray-600 p-1">
+                  <Image
+                    src={pokemon.image}
+                    width={60}
+                    height={60}
+                    alt="Pokemon avatar"
+                  />
+                </div>
                 <p>{pokemon.name}</p>
               </td>
-              <td className="text-center">{pokemon.votes}</td>
+              <td className="pl-6">{pokemon.votes}</td>
             </tr>
           ))}
         </tbody>
