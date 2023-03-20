@@ -38,7 +38,8 @@ export default function Leaderboard() {
     {
       key: "name",
       width: "60%",
-      header: "Name"
+
+      header: "Pokemon"
     },
     {
       key: "votes",
@@ -48,14 +49,12 @@ export default function Leaderboard() {
   ]
 
   return (
-    <div className="mx-auto mt-8 max-w-md text-gray-500">
+    <div className="mx-auto mt-8 max-w-md text-gray-600">
       <div className="mb-2 flex justify-between">
-        <h1 className="text-lg font-semibold italic">
-          Sharpest Pokemon Ranking
-        </h1>
+        <h1 className="font-bold">Sharpest Pokemon Ranking</h1>
       </div>
       <table className="w-full">
-        <thead className="h-[30px] border-b-[1px]">
+        <thead className="h-[30px] bg-gray-100">
           <tr>
             {columns.map((col) => (
               <td
@@ -68,15 +67,15 @@ export default function Leaderboard() {
             ))}
           </tr>
         </thead>
-        <tbody className="[&>*:nth-child(even)]:bg-gray-100">
+        <tbody>
           {pokemons.map((pokemon, i) => (
             <tr
               key={nanoid()}
-              className="my-auto h-20 min-w-[800px]"
+              className="my-auto h-20 min-w-[800px] border-b-[4px] border-gray-50"
             >
               <td className="w-[20%] pl-6">{i + 1}</td>
               <td className="pl flex h-20 items-center justify-start gap-4">
-                <div className="rounded-full bg-gray-600 p-1">
+                <div className="rounded p-1">
                   <Image
                     src={pokemon.image}
                     width={60}

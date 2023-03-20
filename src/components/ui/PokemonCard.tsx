@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { type Dispatch, type SetStateAction, useState, useEffect } from "react"
+import { type Dispatch, type SetStateAction } from "react"
 import DefaultSpinner from "./Spinner"
 import { trpc } from "../../utils/api"
 
@@ -9,6 +9,7 @@ interface PokemonCardProps {
   id: number | undefined
   isLoading: boolean
   hasCastVote: boolean
+  isFetching: boolean
   setHasCastVote: Dispatch<SetStateAction<boolean>>
 }
 
@@ -18,20 +19,25 @@ export default function PokemonCard({
   isLoading,
   id,
   hasCastVote,
-  setHasCastVote
+  setHasCastVote,
+  isFetching
 }: PokemonCardProps) {
-  const [votedForThisPokemon, setHasVotedForThisPokemon] = useState(false)
-  useEffect(() => {
-    setHasVotedForThisPokemon(false)
-  }, [hasCastVote])
+  const getTwoRandomPokemon = trpc.useContext().pokemons.twoRandom
+
+  const util = trpc.useContext().pokemons
+
   const mutation = trpc.pokemons.voteById.useMutation({
-    onSuccess() {
-      console.log("we voted!")
+    onMutate() {
       setHasCastVote(true)
-      setHasVotedForThisPokemon(true)
+      void getTwoRandomPokemon
+        .invalidate()
+        .then(() => {
+          console.log("invalidated")
+        })
+        .catch(console.error)
+      void util.invalidate()
     },
     onError: (error) => {
-      console.log("We failed :(")
       console.log(error.message, error.data?.code)
     }
   })
@@ -44,7 +50,7 @@ export default function PokemonCard({
     <div
       className="flex flex-col gap-2"
       onClick={() => {
-        if (!hasCastVote) {
+        if (!isFetching && !mutation.isLoading) {
           mutation.mutate({ id, name, image: imageUrl })
         }
       }}
@@ -53,12 +59,13 @@ export default function PokemonCard({
         {name}
       </h2>
       <div
-        className={`rounded-3xl bg-gray-100 transition-all ${getTailwindClassesOnVote(
-          hasCastVote,
-          votedForThisPokemon
+        className={`m-4 rounded-3xl bg-gray-100 transition-all ${getTailwindClassesOnVote(
+          isFetching,
+          hasCastVote
         )}`}
       >
         <Image
+          priority
           src={imageUrl}
           alt=""
           width={400}
@@ -69,16 +76,11 @@ export default function PokemonCard({
   )
 }
 
-function getTailwindClassesOnVote(
-  hasCastVote: boolean,
-  hasVotedForThisPokemon: boolean
-) {
+function getTailwindClassesOnVote(isFetching: boolean, hasCastVote: boolean) {
   let classes = ""
-  if (hasCastVote && !hasVotedForThisPokemon) {
-    classes += "bg-gray-200 opacity-30 hover:pointer-events-none"
-  } else if (hasCastVote && hasVotedForThisPokemon) {
-    classes += "bg-green-200 opacity-30 hover:pointer-events-none"
-  } else if (!hasCastVote) {
+  if (isFetching || hasCastVote) {
+    classes += "bg-gray-200 opacity-30 pointer-events-none"
+  } else {
     classes += "hover:scale-105 hover:cursor-pointer"
   }
   return classes
