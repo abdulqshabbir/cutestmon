@@ -14,9 +14,7 @@ const Home: NextPage = () => {
     isError,
     isLoading,
     fetchStatus
-  } = trpc.pokemons.twoRandom.useQuery(undefined, {
-    queryKey: ["pokemons.twoRandom", undefined]
-  })
+  } = trpc.pokemons.twoRandom.useQuery()
 
   const [hasCastVote, setHasCastVote] = useState(false)
 
@@ -69,11 +67,13 @@ interface ButtonsProps {
 }
 
 function Buttons({ hasCastVote, setHasCastVote }: ButtonsProps) {
+  const t = trpc.useContext()
   return hasCastVote ? (
     <div className="m-4 flex flex-col items-center justify-center sm:flex-row sm:gap-8">
       <button
         onClick={() => {
           setHasCastVote(false)
+          void t.pokemons.invalidate()
         }}
         className="m-4 flex items-center justify-center gap-2 rounded-lg bg-purple-200 py-4 px-8 text-gray-600 transition-all hover:scale-110"
       >

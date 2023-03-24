@@ -2,6 +2,9 @@ import Image from "next/image"
 import { type Dispatch, type SetStateAction } from "react"
 import DefaultSpinner from "./Spinner"
 import { trpc } from "../../utils/api"
+import { MdErrorOutline } from "react-icons/md"
+import { IoIosCheckmarkCircle } from "react-icons/Io"
+import toast, { Toaster } from "react-hot-toast"
 
 interface PokemonCardProps {
   name?: string | undefined
@@ -23,14 +26,30 @@ export default function PokemonCard({
   isFetching
 }: PokemonCardProps) {
   const util = trpc.useContext().pokemons
-
   const mutation = trpc.pokemons.voteById.useMutation({
-    async onSettled() {
-      setHasCastVote(true)
-      await util.invalidate()
+    onSuccess() {
+      void util.twoRandom.invalidate()
+      toast("You successfully voted", {
+        duration: 3000,
+        icon: (
+          <div>
+            <IoIosCheckmarkCircle className=" text-green-600" />
+          </div>
+        )
+      })
     },
-    onError: (error) => {
-      console.log(error.message, error.data?.code)
+    onMutate() {
+      setHasCastVote(true)
+    },
+    onError: () => {
+      toast("Sorry, something went wrong with while voting", {
+        duration: 3000,
+        icon: (
+          <div>
+            <MdErrorOutline className="text-yellow-500" />
+          </div>
+        )
+      })
     }
   })
 
@@ -39,32 +58,35 @@ export default function PokemonCard({
   }
 
   return (
-    <div
-      className="flex flex-col gap-2"
-      onClick={() => {
-        if (!isFetching && !mutation.isLoading) {
-          mutation.mutate({ id, name, image: imageUrl })
-        }
-      }}
-    >
-      <h2 className="mb-1 flex justify-center text-lg italic text-gray-400">
-        {name}
-      </h2>
+    <>
+      <Toaster />
       <div
-        className={`m-4 rounded-3xl bg-gray-100 transition-all ${getTailwindClassesOnVote(
-          isFetching,
-          hasCastVote
-        )}`}
+        className="flex flex-col gap-2"
+        onClick={() => {
+          if (!isFetching && !mutation.isLoading) {
+            mutation.mutate({ id, name, image: imageUrl })
+          }
+        }}
       >
-        <Image
-          priority
-          src={imageUrl}
-          alt=""
-          width={400}
-          height={400}
-        />
+        <h2 className="mb-1 flex justify-center text-lg italic text-gray-400">
+          {name}
+        </h2>
+        <div
+          className={`m-4 rounded-3xl bg-gray-100 transition-all ${getTailwindClassesOnVote(
+            isFetching,
+            hasCastVote
+          )}`}
+        >
+          <Image
+            priority
+            src={imageUrl}
+            alt=""
+            width={400}
+            height={400}
+          />
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 
