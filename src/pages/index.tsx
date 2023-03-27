@@ -7,18 +7,26 @@ import { VscRefresh } from "react-icons/vsc"
 import { AiOutlineBarChart } from "react-icons/ai"
 import { trpc } from "../utils/api"
 import PokemonCard from "../components/ui/PokemonCard"
+import DefaultSpinner from "../components/ui/Spinner"
+import { useQueryClient } from "@tanstack/react-query"
 
 const Home: NextPage = () => {
   const {
-    data: pokemons,
-    isError,
-    isLoading,
-    fetchStatus
-  } = trpc.pokemons.twoRandom.useQuery()
+    data: twoPokemon,
+    isError: isTwoPokemonError,
+    isLoading: isLoadingTwoPokemon
+  } = trpc.pokemons.twoRandom.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+    queryKey: ["pokemons.twoRandom", undefined]
+  })
 
   const [hasCastVote, setHasCastVote] = useState(false)
 
-  if (isError) {
+  if (isLoadingTwoPokemon) {
+    return <DefaultSpinner />
+  }
+
+  if (isTwoPokemonError) {
     return <div>Sorry something went wrong</div>
   }
   return (
@@ -34,20 +42,18 @@ const Home: NextPage = () => {
         <Title />
         <div className="m-8 flex flex-col gap-8 sm:flex-row">
           <PokemonCard
-            name={pokemons?.[0]?.name}
-            imageUrl={pokemons?.[0]?.image}
-            isLoading={isLoading}
-            isFetching={fetchStatus === "fetching"}
-            id={pokemons?.[0]?.id}
+            name={twoPokemon?.[0]?.name}
+            imageUrl={twoPokemon?.[0]?.image}
+            isLoadingTwoPokemon={isLoadingTwoPokemon}
+            id={twoPokemon?.[0]?.id}
             setHasCastVote={setHasCastVote}
             hasCastVote={hasCastVote}
           />
           <PokemonCard
-            name={pokemons?.[1]?.name}
-            imageUrl={pokemons?.[1]?.image}
-            isLoading={isLoading}
-            isFetching={fetchStatus === "fetching"}
-            id={pokemons?.[0]?.id}
+            name={twoPokemon?.[1]?.name}
+            imageUrl={twoPokemon?.[1]?.image}
+            isLoadingTwoPokemon={isLoadingTwoPokemon}
+            id={twoPokemon?.[0]?.id}
             setHasCastVote={setHasCastVote}
             hasCastVote={hasCastVote}
           />
@@ -67,13 +73,20 @@ interface ButtonsProps {
 }
 
 function Buttons({ hasCastVote, setHasCastVote }: ButtonsProps) {
-  const t = trpc.useContext()
+  const client = useQueryClient()
+
   return hasCastVote ? (
-    <div className="m-4 flex flex-col items-center justify-center sm:flex-row sm:gap-8">
+    <div
+      className="m-4 flex flex-col items-center justify-center sm:flex-row sm:gap-8"
+      onClick={() => {
+        void client.invalidateQueries({
+          queryKey: ["pokemon.twoRandom", undefined]
+        })
+      }}
+    >
       <button
         onClick={() => {
           setHasCastVote(false)
-          void t.pokemons.invalidate()
         }}
         className="m-4 flex items-center justify-center gap-2 rounded-lg bg-purple-200 py-4 px-8 text-gray-600 transition-all hover:scale-110"
       >

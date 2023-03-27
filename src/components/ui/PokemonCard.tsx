@@ -10,25 +10,22 @@ interface PokemonCardProps {
   name?: string | undefined
   imageUrl?: string | undefined
   id: number | undefined
-  isLoading: boolean
+  isLoadingTwoPokemon: boolean
   hasCastVote: boolean
-  isFetching: boolean
   setHasCastVote: Dispatch<SetStateAction<boolean>>
 }
 
 export default function PokemonCard({
   name,
   imageUrl,
-  isLoading,
+  isLoadingTwoPokemon,
   id,
   hasCastVote,
-  setHasCastVote,
-  isFetching
+  setHasCastVote
 }: PokemonCardProps) {
   const util = trpc.useContext().pokemons
   const mutation = trpc.pokemons.voteById.useMutation({
     onSuccess() {
-      void util.twoRandom.invalidate()
       toast("You successfully voted", {
         duration: 3000,
         icon: (
@@ -50,10 +47,13 @@ export default function PokemonCard({
           </div>
         )
       })
+    },
+    onSettled() {
+      void util.twoRandom.invalidate()
     }
   })
 
-  if (!name || !imageUrl || !id || isLoading) {
+  if (!name || !imageUrl || !id || isLoadingTwoPokemon) {
     return <SkeletonPokemonCard />
   }
 
@@ -63,7 +63,7 @@ export default function PokemonCard({
       <div
         className="flex flex-col gap-2"
         onClick={() => {
-          if (!isFetching && !mutation.isLoading) {
+          if (!mutation.isLoading) {
             mutation.mutate({ id, name, image: imageUrl })
           }
         }}
@@ -73,7 +73,6 @@ export default function PokemonCard({
         </h2>
         <div
           className={`m-4 rounded-3xl bg-gray-100 transition-all ${getTailwindClassesOnVote(
-            isFetching,
             hasCastVote
           )}`}
         >
@@ -90,9 +89,9 @@ export default function PokemonCard({
   )
 }
 
-function getTailwindClassesOnVote(isFetching: boolean, hasCastVote: boolean) {
+function getTailwindClassesOnVote(hasCastVote: boolean) {
   let classes = ""
-  if (isFetching || hasCastVote) {
+  if (hasCastVote) {
     classes += "bg-gray-200 opacity-30 pointer-events-none"
   } else {
     classes += "hover:scale-105 hover:cursor-pointer"
