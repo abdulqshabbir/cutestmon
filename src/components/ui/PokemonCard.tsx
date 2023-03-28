@@ -2,6 +2,8 @@ import Image from "next/image"
 import { type Dispatch, type SetStateAction } from "react"
 import DefaultSpinner from "./Spinner"
 import { trpc } from "../../utils/api"
+import { getQueryKey } from "@trpc/react-query"
+import { useQueryClient } from "@tanstack/react-query"
 import { MdErrorOutline } from "react-icons/md"
 import { IoIosCheckmarkCircle } from "react-icons/Io"
 import toast, { Toaster } from "react-hot-toast"
@@ -23,7 +25,15 @@ export default function PokemonCard({
   hasCastVote,
   setHasCastVote
 }: PokemonCardProps) {
-  const util = trpc.useContext().pokemons
+  const queryClient = useQueryClient()
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  const queryKey = getQueryKey(
+    trpc.pokemons.twoRandom,
+    undefined,
+    "query"
+  ) as unknown[]
+
   const mutation = trpc.pokemons.voteById.useMutation({
     onSuccess() {
       toast("You successfully voted", {
@@ -34,6 +44,7 @@ export default function PokemonCard({
           </div>
         )
       })
+      void queryClient.invalidateQueries({ queryKey })
     },
     onMutate() {
       setHasCastVote(true)
@@ -47,9 +58,6 @@ export default function PokemonCard({
           </div>
         )
       })
-    },
-    onSettled() {
-      void util.twoRandom.invalidate()
     }
   })
 

@@ -38,9 +38,9 @@ const Home: NextPage = () => {
           content="Vote on which pokemon you think is most pointy!"
         />
       </Head>
-      <main className=" mb-8 flex min-h-screen flex-col items-center justify-center">
+      <main className="flex min-h-screen flex-col items-center justify-start">
         <Title />
-        <div className="m-8 flex flex-col gap-8 sm:flex-row">
+        <div className="m-4 flex flex-col sm:flex-row">
           <PokemonCard
             name={twoPokemon?.[0]?.name}
             imageUrl={twoPokemon?.[0]?.image}
@@ -73,28 +73,19 @@ interface ButtonsProps {
 }
 
 function Buttons({ hasCastVote, setHasCastVote }: ButtonsProps) {
-  const client = useQueryClient()
-
   return hasCastVote ? (
-    <div
-      className="m-4 flex flex-col items-center justify-center sm:flex-row sm:gap-8"
-      onClick={() => {
-        void client.invalidateQueries({
-          queryKey: ["pokemon.twoRandom", undefined]
-        })
-      }}
-    >
+    <div className="m-4 flex flex-col items-center justify-center sm:flex-row sm:gap-8">
       <button
         onClick={() => {
           setHasCastVote(false)
         }}
-        className="m-4 flex items-center justify-center gap-2 rounded-lg bg-purple-200 py-4 px-8 text-gray-600 transition-all hover:scale-110"
+        className="m-4 flex items-center justify-center gap-2 rounded-lg border-[0.5px] border-gray-700 py-4 px-8 text-gray-600 transition-all hover:scale-105"
       >
         <span>Vote Again</span>
         <VscRefresh />
       </button>
       <Link href="/leaderboard">
-        <button className="flex items-center justify-center gap-2 rounded-lg bg-green-200 py-4 px-8 text-gray-600 transition-all hover:scale-110">
+        <button className="flex items-center justify-center gap-2 rounded-lg bg-blue-300 py-4 px-8 font-bold text-white transition-all hover:scale-105">
           <span>Show Results</span>
           <AiOutlineBarChart />
         </button>
@@ -105,7 +96,7 @@ function Buttons({ hasCastVote, setHasCastVote }: ButtonsProps) {
 
 function Title() {
   return (
-    <h1 className=" mt-0 p-4 text-lg font-bold text-gray-500 sm:m-8 sm:text-2xl">
+    <h1 className="p-0 text-lg font-bold text-gray-500 sm:m-2 sm:text-2xl">
       Which pokemon is more <span className="italic">pointy</span>?
     </h1>
   )
