@@ -5,7 +5,7 @@ import { trpc } from "../../utils/api"
 import { getQueryKey } from "@trpc/react-query"
 import { useQueryClient } from "@tanstack/react-query"
 import { MdErrorOutline } from "react-icons/md"
-import { IoIosCheckmarkCircle } from "react-icons/Io"
+import { IoCheckmarkCircle } from "react-icons/io5"
 import toast, { Toaster } from "react-hot-toast"
 
 interface PokemonCardProps {
@@ -40,7 +40,7 @@ export default function PokemonCard({
         duration: 3000,
         icon: (
           <div>
-            <IoIosCheckmarkCircle className=" text-green-600" />
+            <IoCheckmarkCircle className=" text-green-600" />
           </div>
         )
       })
