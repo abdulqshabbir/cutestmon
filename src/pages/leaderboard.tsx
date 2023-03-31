@@ -11,10 +11,12 @@ interface Column {
 }
 
 export default function Leaderboard() {
-  const { isLoading, isError, data, error } = trpc.pokemons.all.useQuery(
-    undefined,
-    { retry: false }
-  )
+  const { isLoading, isError, data, error } =
+    trpc.pokemons.allInfinite.useInfiniteQuery(
+      { take: 30 },
+      { getNextPageParam: (lastPage) => lastPage.nextCursor }
+    )
+
   if (isLoading) {
     return "Loading..."
   }
@@ -23,11 +25,13 @@ export default function Leaderboard() {
     return error.message
   }
 
-  const pokemons = data.map((pokemon, i) => ({
-    ...pokemon,
-    rank: i,
-    pointsFor: i
-  }))
+  const pokemons = data.pages
+    .flatMap((page) => page.pokemons)
+    .map((pokemon, i) => ({
+      ...pokemon,
+      rank: i,
+      pointsFor: i
+    }))
 
   const columns: Column[] = [
     {
