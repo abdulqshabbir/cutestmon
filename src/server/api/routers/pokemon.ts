@@ -27,6 +27,37 @@ export const pokemonRouter = createTRPCRouter({
     })
     return pokemons
   }),
+  allInfinite: publicProcedure
+    .input(
+      z.object({
+        take: z.number().min(1).max(150).nullish(),
+        cursor: z.number().nullish()
+      })
+    )
+    .query(async ({ input }) => {
+      const limit = input?.take ?? 30
+      const pokemons = await prisma.pokemon.findMany({
+        take: limit + 1,
+        orderBy: [
+          {
+            votes: "desc"
+          }
+        ],
+        // use id of pokemon as our cursor
+        cursor: input?.cursor ? { id: input.cursor } : undefined
+      })
+
+      let nextCursor = undefined
+      if (pokemons.length > limit) {
+        const nextPokemonCursor = pokemons.pop()
+        nextCursor = nextPokemonCursor?.id
+      }
+
+      return {
+        pokemons,
+        nextCursor
+      }
+    }),
   twoRandom: publicProcedure.output(getTwoRandomPokemons).query(async () => {
     const urls = getTwoRandomPokemonUrls()
     const res = (await Promise.all([
