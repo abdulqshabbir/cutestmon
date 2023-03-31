@@ -8,7 +8,7 @@ import { AiOutlineBarChart } from "react-icons/ai"
 import { trpc } from "../utils/api"
 import PokemonCard from "../components/ui/PokemonCard"
 import DefaultSpinner from "../components/ui/Spinner"
-import { useQueryClient } from "@tanstack/react-query"
+import Button from "../components/ui/Button"
 
 const Home: NextPage = () => {
   const {
@@ -75,20 +75,21 @@ interface ButtonsProps {
 function Buttons({ hasCastVote, setHasCastVote }: ButtonsProps) {
   return hasCastVote ? (
     <div className="m-4 flex flex-col items-center justify-center sm:flex-row sm:gap-8">
-      <button
+      <Button
+        variant="secondary"
         onClick={() => {
           setHasCastVote(false)
         }}
-        className="m-4 flex items-center justify-center gap-2 rounded-lg border-[0.5px] border-gray-700 py-4 px-8 text-gray-600 transition-all hover:scale-105"
       >
         <span>Vote Again</span>
         <VscRefresh />
-      </button>
-      <Link href="/leaderboard">
-        <button className="flex items-center justify-center gap-2 rounded-lg bg-blue-300 py-4 px-8 font-bold text-white transition-all hover:scale-105">
-          <span>Show Results</span>
-          <AiOutlineBarChart />
-        </button>
+      </Button>
+      <Link
+        href="/leaderboard"
+        className="flex items-center justify-center gap-2 rounded-lg bg-blue-300 py-4 px-8 font-bold text-white transition-all hover:scale-105"
+      >
+        <span>Show Results</span>
+        <AiOutlineBarChart />
       </Link>
     </div>
   ) : null
