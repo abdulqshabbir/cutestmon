@@ -2,6 +2,7 @@ import { trpc } from "../utils/api"
 import { nanoid } from "nanoid"
 import Image from "next/image"
 import { type CSSProperties } from "react"
+import Button from "../components/ui/Button"
 
 interface Column {
   key: string
@@ -11,11 +12,18 @@ interface Column {
 }
 
 export default function Leaderboard() {
-  const { isLoading, isError, data, error } =
-    trpc.pokemons.allInfinite.useInfiniteQuery(
-      { take: 30 },
-      { getNextPageParam: (lastPage) => lastPage.nextCursor }
-    )
+  const {
+    isLoading,
+    isError,
+    data,
+    error,
+    fetchNextPage: fetchNextPokemonPage,
+    isFetchingNextPage: isFetchingNextPokemonPage,
+    hasNextPage: hasNextPokemonPage
+  } = trpc.pokemons.allInfinite.useInfiniteQuery(
+    { take: 30 },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor }
+  )
 
   if (isLoading) {
     return "Loading..."
@@ -94,6 +102,24 @@ export default function Leaderboard() {
           ))}
         </tbody>
       </table>
+      {hasNextPokemonPage && (
+        <div className="flex items-center justify-center">
+          <Button
+            variant="primary"
+            onClick={() => void fetchNextPokemonPage()}
+            isLoading={isFetchingNextPokemonPage}
+            fullWidth
+            styles={{
+              width: "300px",
+              borderColor: "gray",
+              marginTop: "50px",
+              marginBottom: "100px"
+            }}
+          >
+            Fetch Next 30 Pokemon
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
