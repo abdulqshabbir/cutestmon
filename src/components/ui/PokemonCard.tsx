@@ -39,7 +39,7 @@ export default function PokemonCard({
     } else {
       setHasCastVote(false)
     }
-  }, [mutation.isLoading, setIsVoting, setHasCastVote])
+  }, [mutation.isLoading, setIsVoting, setHasCastVote, mutation.isSuccess])
 
   if (isLoadingTwoPokemon || isVoting || !id || !name || !imageUrl) {
     return <SkeletonPokemonCard />

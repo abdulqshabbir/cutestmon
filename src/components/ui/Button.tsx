@@ -40,6 +40,9 @@ function BaseButton({
 interface ButtonProps {
   variant: "primary" | "secondary"
   children: React.ReactNode
+  isLoading?: boolean
+  fullWidth?: boolean
+  styles?: React.CSSProperties
   onClick: MouseEventHandler<HTMLButtonElement>
 }
 
