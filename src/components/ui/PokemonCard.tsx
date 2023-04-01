@@ -90,7 +90,7 @@ function SkeletonPokemonCard() {
   return (
     <div className="m-4 flex flex-col">
       <div className="max-w-7/12 mb-4 flex h-8 animate-pulse self-center rounded-xl bg-gray-200"></div>
-      <div className=" flex h-[300px] w-[300px] animate-pulse items-center justify-center rounded-3xl bg-gray-200 transition-all hover:scale-105 hover:cursor-pointer hover:bg-gray-200">
+      <div className=" flex h-[300px] w-[300px] animate-pulse items-center justify-center rounded-3xl bg-gray-200 transition-all hover:bg-gray-200">
         <DefaultSpinner />
       </div>
     </div>
