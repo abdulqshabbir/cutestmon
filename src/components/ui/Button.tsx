@@ -7,6 +7,7 @@ interface BaseButtonProps {
   isLoading?: boolean
   fullWidth?: boolean
   styles?: React.CSSProperties
+  onClick: MouseEventHandler<HTMLButtonElement>
 }
 
 function BaseButton({
@@ -15,6 +16,7 @@ function BaseButton({
   isLoading,
   fullWidth = false,
   styles,
+  onClick,
   ...props
 }: BaseButtonProps) {
   const baseStyles: React.CSSProperties = {
@@ -23,6 +25,7 @@ function BaseButton({
   return (
     <button
       className={className}
+      onClick={onClick}
       style={{
         ...baseStyles,
         ...styles
@@ -37,10 +40,7 @@ function BaseButton({
 interface ButtonProps {
   variant: "primary" | "secondary"
   children: React.ReactNode
-  isLoading?: boolean
-  fullWidth?: boolean
-  styles?: React.CSSProperties
-  onClick?: MouseEventHandler<HTMLButtonElement>
+  onClick: MouseEventHandler<HTMLButtonElement>
 }
 
 const primaryStyles =
@@ -49,17 +49,11 @@ const primaryStyles =
 const secondaryStyles =
   "flex items-center justify-center gap-2 rounded-lg border-[0.5px] border-gray-700 py-4 px-8 text-gray-600 transition-all hover:scale-105"
 
-export default function Button({
-  variant,
-  children,
-  styles,
-  ...rest
-}: ButtonProps) {
+export default function Button({ variant, children, ...rest }: ButtonProps) {
   if (variant === "primary") {
     return (
       <BaseButton
         className={primaryStyles}
-        styles={styles}
         {...rest}
       >
         {children}
@@ -70,12 +64,18 @@ export default function Button({
     return (
       <BaseButton
         className={secondaryStyles}
-        styles={styles}
         {...rest}
       >
         {children}
       </BaseButton>
     )
   }
-  return null
+  return (
+    <BaseButton
+      className={secondaryStyles}
+      {...rest}
+    >
+      {children}
+    </BaseButton>
+  )
 }

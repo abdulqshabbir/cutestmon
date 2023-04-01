@@ -14,13 +14,15 @@ const Home: NextPage = () => {
   const {
     data: twoPokemon,
     isError: isTwoPokemonError,
-    isLoading: isLoadingTwoPokemon
+    isLoading: isLoadingTwoPokemon,
+    isRefetching: isFetchingTwoPokemon
   } = trpc.pokemons.twoRandom.useQuery(undefined, {
     refetchOnWindowFocus: false,
     queryKey: ["pokemons.twoRandom", undefined]
   })
 
   const [hasCastVote, setHasCastVote] = useState(false)
+  const [isVoting, setIsVoting] = useState(false)
 
   if (isLoadingTwoPokemon) {
     return <DefaultSpinner />
@@ -35,33 +37,41 @@ const Home: NextPage = () => {
         <title>Sharpest Pokemon</title>
         <meta
           name="description"
-          content="Vote on which pokemon you think is most pointy!"
+          content="Vote on which pokemon you think is happiest :)"
         />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-start">
         <Title />
-        <div className="m-4 flex flex-col sm:flex-row">
-          <PokemonCard
-            name={twoPokemon?.[0]?.name}
-            imageUrl={twoPokemon?.[0]?.image}
-            isLoadingTwoPokemon={isLoadingTwoPokemon}
-            id={twoPokemon?.[0]?.id}
-            setHasCastVote={setHasCastVote}
+        {!hasCastVote && (
+          <div className="m-4 flex flex-col sm:flex-row">
+            <PokemonCard
+              name={twoPokemon?.[0]?.name}
+              imageUrl={twoPokemon?.[0]?.image}
+              isLoadingTwoPokemon={isLoadingTwoPokemon || isFetchingTwoPokemon}
+              id={twoPokemon?.[0]?.id}
+              hasCastVote={hasCastVote}
+              setHasCastVote={setHasCastVote}
+              isVoting={isVoting}
+              setIsVoting={setIsVoting}
+            />
+            <PokemonCard
+              name={twoPokemon?.[1]?.name}
+              imageUrl={twoPokemon?.[1]?.image}
+              isLoadingTwoPokemon={isLoadingTwoPokemon || isFetchingTwoPokemon}
+              id={twoPokemon?.[0]?.id}
+              hasCastVote={hasCastVote}
+              setHasCastVote={setHasCastVote}
+              isVoting={isVoting}
+              setIsVoting={setIsVoting}
+            />
+          </div>
+        )}
+        {hasCastVote && (
+          <Buttons
             hasCastVote={hasCastVote}
-          />
-          <PokemonCard
-            name={twoPokemon?.[1]?.name}
-            imageUrl={twoPokemon?.[1]?.image}
-            isLoadingTwoPokemon={isLoadingTwoPokemon}
-            id={twoPokemon?.[0]?.id}
             setHasCastVote={setHasCastVote}
-            hasCastVote={hasCastVote}
           />
-        </div>
-        <Buttons
-          hasCastVote={hasCastVote}
-          setHasCastVote={setHasCastVote}
-        />
+        )}
       </main>
     </>
   )
@@ -98,7 +108,7 @@ function Buttons({ hasCastVote, setHasCastVote }: ButtonsProps) {
 function Title() {
   return (
     <h1 className="p-0 text-lg font-bold text-gray-500 sm:m-2 sm:text-2xl">
-      Which pokemon is more <span className="italic">pointy</span>?
+      Which Pokemon is <span className="italic">looks happier</span>?
     </h1>
   )
 }

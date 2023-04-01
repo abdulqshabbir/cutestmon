@@ -1,20 +1,18 @@
+import { useEffect } from "react"
 import Image from "next/image"
 import { type Dispatch, type SetStateAction } from "react"
 import DefaultSpinner from "./Spinner"
-import { trpc } from "../../utils/api"
-import { getQueryKey } from "@trpc/react-query"
-import { useQueryClient } from "@tanstack/react-query"
-import { MdErrorOutline } from "react-icons/md"
-import { IoCheckmarkCircle } from "react-icons/io5"
-import toast, { Toaster } from "react-hot-toast"
+import useVoteForPokemon from "../../hooks/useVoteForPokemon"
 
 interface PokemonCardProps {
   name?: string | undefined
   imageUrl?: string | undefined
   id: number | undefined
+  isVoting: boolean
   isLoadingTwoPokemon: boolean
   hasCastVote: boolean
   setHasCastVote: Dispatch<SetStateAction<boolean>>
+  setIsVoting: Dispatch<SetStateAction<boolean>>
 }
 
 export default function PokemonCard({
@@ -23,56 +21,37 @@ export default function PokemonCard({
   isLoadingTwoPokemon,
   id,
   hasCastVote,
+  isVoting,
+  setIsVoting,
   setHasCastVote
 }: PokemonCardProps) {
-  const queryClient = useQueryClient()
+  const mutation = useVoteForPokemon()
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  const queryKey = getQueryKey(
-    trpc.pokemons.twoRandom,
-    undefined,
-    "query"
-  ) as unknown[]
-
-  const mutation = trpc.pokemons.voteById.useMutation({
-    onSuccess() {
-      toast("You successfully voted", {
-        duration: 3000,
-        icon: (
-          <div>
-            <IoCheckmarkCircle className=" text-green-600" />
-          </div>
-        )
-      })
-      void queryClient.invalidateQueries({ queryKey })
-    },
-    onMutate() {
-      setHasCastVote(true)
-    },
-    onError: () => {
-      toast("Sorry, something went wrong with while voting", {
-        duration: 3000,
-        icon: (
-          <div>
-            <MdErrorOutline className="text-yellow-500" />
-          </div>
-        )
-      })
+  useEffect(() => {
+    if (mutation.isLoading) {
+      setIsVoting(true)
+    } else {
+      setIsVoting(false)
     }
-  })
 
-  if (!name || !imageUrl || !id || isLoadingTwoPokemon) {
+    if (mutation.isSuccess) {
+      setHasCastVote(true)
+    } else {
+      setHasCastVote(false)
+    }
+  }, [mutation.isLoading, setIsVoting, setHasCastVote])
+
+  if (isLoadingTwoPokemon || isVoting || !id || !name || !imageUrl) {
     return <SkeletonPokemonCard />
   }
 
   return (
     <>
-      <Toaster />
       <div
         className="flex flex-col gap-2"
         onClick={() => {
-          if (!mutation.isLoading) {
-            mutation.mutate({ id, name, image: imageUrl })
+          if (!isVoting) {
+            void mutation.mutate({ id, name, image: imageUrl })
           }
         }}
       >
