@@ -3,6 +3,7 @@ import { nanoid } from "nanoid"
 import Image from "next/image"
 import { type CSSProperties } from "react"
 import Button from "../components/ui/Button"
+import DefaultSpinner from "../components/ui/Spinner"
 
 interface Column {
   key: string
@@ -26,7 +27,7 @@ export default function Leaderboard() {
   )
 
   if (isLoading) {
-    return "Loading..."
+    return <DefaultSpinner />
   }
 
   if (isError) {
