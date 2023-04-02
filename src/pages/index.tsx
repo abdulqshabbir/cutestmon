@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from "react"
+import { useEffect } from "react"
 import { useState } from "react"
 import { type NextPage } from "next"
 import Link from "next/link"
@@ -9,6 +10,7 @@ import { trpc } from "../utils/api"
 import PokemonCard from "../components/ui/PokemonCard"
 import DefaultSpinner from "../components/ui/Spinner"
 import Button from "../components/ui/Button"
+import toast, { Toaster } from "react-hot-toast"
 
 const Home: NextPage = () => {
   const {
@@ -23,6 +25,15 @@ const Home: NextPage = () => {
 
   const [hasCastVote, setHasCastVote] = useState(false)
   const [isVoting, setIsVoting] = useState(false)
+  const [pokemonVotedFor, setPokemonVotedFor] = useState("")
+
+  useEffect(() => {
+    if (hasCastVote) {
+      toast.success("You voted " + pokemonVotedFor + " is happier!", {
+        duration: 3000
+      })
+    }
+  }, [hasCastVote])
 
   if (isLoadingTwoPokemon) {
     return <DefaultSpinner />
@@ -41,6 +52,7 @@ const Home: NextPage = () => {
         />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-start">
+        <Toaster position="bottom-center" />
         <Title />
         {!hasCastVote && (
           <div className="m-4 flex flex-col sm:flex-row">
@@ -53,6 +65,7 @@ const Home: NextPage = () => {
               setHasCastVote={setHasCastVote}
               isVoting={isVoting}
               setIsVoting={setIsVoting}
+              setPokemonVotedFor={setPokemonVotedFor}
             />
             <PokemonCard
               name={twoPokemon?.[1]?.name}
@@ -63,6 +76,7 @@ const Home: NextPage = () => {
               setHasCastVote={setHasCastVote}
               isVoting={isVoting}
               setIsVoting={setIsVoting}
+              setPokemonVotedFor={setPokemonVotedFor}
             />
           </div>
         )}
@@ -108,7 +122,7 @@ function Buttons({ hasCastVote, setHasCastVote }: ButtonsProps) {
 function Title() {
   return (
     <h1 className="p-0 text-lg font-bold text-gray-500 sm:m-2 sm:text-2xl">
-      Which Pokemon is <span className="italic">looks happier</span>?
+      Which Pokemon <span className="italic">seems happier</span> &#128512; ?
     </h1>
   )
 }

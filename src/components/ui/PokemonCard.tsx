@@ -13,6 +13,7 @@ interface PokemonCardProps {
   hasCastVote: boolean
   setHasCastVote: Dispatch<SetStateAction<boolean>>
   setIsVoting: Dispatch<SetStateAction<boolean>>
+  setPokemonVotedFor: Dispatch<SetStateAction<string>>
 }
 
 export default function PokemonCard({
@@ -23,7 +24,8 @@ export default function PokemonCard({
   hasCastVote,
   isVoting,
   setIsVoting,
-  setHasCastVote
+  setHasCastVote,
+  setPokemonVotedFor
 }: PokemonCardProps) {
   const mutation = useVoteForPokemon()
 
@@ -36,10 +38,18 @@ export default function PokemonCard({
 
     if (mutation.isSuccess) {
       setHasCastVote(true)
+      setPokemonVotedFor(mutation?.data?.name ?? "")
     } else {
       setHasCastVote(false)
     }
-  }, [mutation.isLoading, setIsVoting, setHasCastVote, mutation.isSuccess])
+  }, [
+    mutation.isLoading,
+    mutation.isSuccess,
+    mutation?.data?.name,
+    setIsVoting,
+    setHasCastVote,
+    setPokemonVotedFor
+  ])
 
   if (isLoadingTwoPokemon || isVoting || !id || !name || !imageUrl) {
     return <SkeletonPokemonCard />

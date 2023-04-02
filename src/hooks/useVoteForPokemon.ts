@@ -16,7 +16,6 @@ export default function useVoteForPokemon(options?: VoteForPokemonOptions) {
   return trpc.pokemons.voteById.useMutation({
     ...options,
     onMutate() {
-      console.log("mutate")
       void queryClient.invalidateQueries({ queryKey })
     }
   })
