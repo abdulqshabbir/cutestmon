@@ -33,7 +33,7 @@ const Home: NextPage = () => {
         duration: 3000
       })
     }
-  }, [hasCastVote])
+  }, [hasCastVote, pokemonVotedFor])
 
   if (isLoadingTwoPokemon) {
     return <DefaultSpinner />

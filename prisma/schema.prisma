@@ -75,4 +75,12 @@ model Pokemon {
     image       String
     name        String
     votes       Int @default(0)
+    ranking     Ranking?
+}
+
+model Ranking {
+    id Int @id @unique
+    ranking Int @default(1000)
+    pokemonId Int @unique
+    pokemon Pokemon @relation(fields: [pokemonId], references: [id])
 }
