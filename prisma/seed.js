@@ -1,6 +1,4 @@
-import type { pokemonAPI } from "../src/server/schemas/pokemon"
-import type { z } from "zod"
-import { PrismaClient } from "@prisma/client"
+const { PrismaClient } = require("@prisma/client")
 
 const prisma = new PrismaClient()
 
@@ -8,7 +6,7 @@ async function main() {
   const pokemonUrls = getAllPokemonUrls()
   const pokemonsFromApi = (await Promise.all([
     ...pokemonUrls.map((url) => fetch(url).then((res) => res.json()))
-  ])) as z.infer<typeof pokemonAPI>[]
+  ]))
 
   await prisma.pokemon.createMany({
     data: pokemonsFromApi.map((p) => {

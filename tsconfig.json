@@ -17,6 +17,13 @@
     "noUncheckedIndexedAccess": true,
     "sourceMap": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.cjs", "**/*.mjs"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.cjs",
+    "**/*.mjs",
+    "prisma/seed.js"
+  ],
   "exclude": ["node_modules"]
 }
