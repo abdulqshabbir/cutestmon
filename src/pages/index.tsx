@@ -58,9 +58,9 @@ const Home: NextPage = () => {
           <div className="m-4 flex flex-col sm:flex-row">
             <PokemonCard
               name={twoPokemon?.[0]?.name}
-              imageUrl={twoPokemon?.[0]?.image}
               isLoadingTwoPokemon={isLoadingTwoPokemon || isFetchingTwoPokemon}
               id={twoPokemon?.[0]?.id}
+              idVotedAgainst={twoPokemon?.[1]?.id}
               hasCastVote={hasCastVote}
               setHasCastVote={setHasCastVote}
               isVoting={isVoting}
@@ -69,9 +69,9 @@ const Home: NextPage = () => {
             />
             <PokemonCard
               name={twoPokemon?.[1]?.name}
-              imageUrl={twoPokemon?.[1]?.image}
               isLoadingTwoPokemon={isLoadingTwoPokemon || isFetchingTwoPokemon}
-              id={twoPokemon?.[0]?.id}
+              id={twoPokemon?.[1]?.id}
+              idVotedAgainst={twoPokemon?.[0]?.id}
               hasCastVote={hasCastVote}
               setHasCastVote={setHasCastVote}
               isVoting={isVoting}
@@ -122,7 +122,7 @@ function Buttons({ hasCastVote, setHasCastVote }: ButtonsProps) {
 function Title() {
   return (
     <h1 className="p-0 text-lg font-bold text-gray-500 sm:m-2 sm:text-2xl">
-      Which Pokemon <span className="italic">seems happier</span> &#128512; ?
+      Which Pokemon <span className="italic">seems happier</span>? &#128512;
     </h1>
   )
 }

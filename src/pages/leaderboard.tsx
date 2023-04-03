@@ -34,13 +34,7 @@ export default function Leaderboard() {
     return error.message
   }
 
-  const pokemons = data.pages
-    .flatMap((page) => page.pokemons)
-    .map((pokemon, i) => ({
-      ...pokemon,
-      rank: i,
-      pointsFor: i
-    }))
+  const pokemons = data.pages.flatMap((page) => page.pokemons)
 
   const columns: Column[] = [
     {
@@ -57,7 +51,7 @@ export default function Leaderboard() {
     {
       key: "votes",
       width: "20%",
-      header: "Votes"
+      header: "Elo Rating"
     }
   ]
 
@@ -90,7 +84,7 @@ export default function Leaderboard() {
               <td className="pl flex h-20 items-center justify-start gap-4">
                 <div className="rounded p-1">
                   <Image
-                    src={pokemon.image}
+                    src={`/pokemon/${pokemon.id}.png`}
                     width={60}
                     height={60}
                     alt="Pokemon avatar"
@@ -98,7 +92,7 @@ export default function Leaderboard() {
                 </div>
                 <p>{pokemon.name}</p>
               </td>
-              <td className="pl-6">{pokemon.votes}</td>
+              <td className="pl-6">{Math.floor(pokemon.ranking)}</td>
             </tr>
           ))}
         </tbody>

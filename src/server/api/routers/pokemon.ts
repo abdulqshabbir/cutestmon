@@ -1,27 +1,20 @@
 import { z } from "zod"
 import { createTRPCRouter, publicProcedure } from "../trpc"
 import { TRPCError } from "@trpc/server"
-import { type pokemonAPI } from "../../schemas/pokemon"
-import fetch from "node-fetch"
 import * as _ from "lodash"
 import { prisma } from "../../db"
 
-const pokemonSchema = z.object({
-  image: z.string(),
-  name: z.string(),
+const voteByIdInput = z.object({
   id: z.number(),
-  votes: z.number().optional()
+  idVotedAgainst: z.number()
 })
 
-const getAllPokemonsOutput = pokemonSchema.array()
-const getTwoRandomPokemons = pokemonSchema.array()
-
 export const pokemonRouter = createTRPCRouter({
-  all: publicProcedure.output(getAllPokemonsOutput).query(async () => {
+  all: publicProcedure.query(async () => {
     const pokemons = await prisma.pokemon.findMany({
       orderBy: [
         {
-          votes: "desc"
+          ranking: "desc"
         }
       ]
     })
@@ -40,7 +33,7 @@ export const pokemonRouter = createTRPCRouter({
         take: limit + 1,
         orderBy: [
           {
-            votes: "desc"
+            ranking: "desc"
           }
         ],
         // use id of pokemon as our cursor
@@ -58,62 +51,124 @@ export const pokemonRouter = createTRPCRouter({
         nextCursor
       }
     }),
-  twoRandom: publicProcedure.output(getTwoRandomPokemons).query(async () => {
-    const urls = getTwoRandomPokemonUrls()
-    const res = (await Promise.all([
-      ...urls.map((url) => fetch(url).then((res) => res.json()))
-    ])) as z.infer<typeof pokemonAPI>[]
+  twoRandom: publicProcedure.query(async () => {
+    const [idFirst, idSecond] = getTwoRandomPokemonIds()
 
-    return res.map((pokemon) => ({
-      name: pokemon?.name,
-      image: pokemon.sprites.other?.["official-artwork"]?.front_default,
-      id: pokemon.id
-    }))
-  }),
-  voteById: publicProcedure
-    .input(pokemonSchema)
-    .output(pokemonSchema)
-    .mutation(async (req) => {
-      const { id, image, name } = req.input
-      if (id < 1 || id > 150)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Pokemon ids must be between 1 - 150"
-        })
-
-      const pokemon = await prisma.pokemon.findUnique({
-        where: {
-          id: id
-        }
-      })
-
-      if (!pokemon) {
-        return await prisma.pokemon.create({
-          data: {
-            id,
-            image,
-            name,
-            votes: 1
+    const pokemon = await prisma.pokemon.findMany({
+      where: {
+        OR: [
+          {
+            id: idFirst
+          },
+          {
+            id: idSecond
           }
-        })
-      } else {
-        return await prisma.pokemon.update({
-          where: { id },
-          data: { votes: { increment: 1 } }
-        })
+        ]
       }
     })
+
+    return pokemon
+  }),
+
+  voteById: publicProcedure.input(voteByIdInput).mutation(async (req) => {
+    const { id, idVotedAgainst } = req.input
+
+    if (id < 1 || id > 150)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Pokemon ids must be between 1 - 150"
+      })
+
+    const votedForPokemon = await prisma.pokemon.findUnique({
+      where: {
+        id: id
+      }
+    })
+
+    const votedAgainstPokemon = await prisma.pokemon.findUnique({
+      where: {
+        id: idVotedAgainst
+      }
+    })
+
+    if (!votedForPokemon) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "We could not find the pokemon you voted for in the db :("
+      })
+    }
+
+    if (!votedAgainstPokemon) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "We could not find the pokemon you voted against in the db :("
+      })
+    }
+    const ratingA = votedForPokemon.ranking
+    const ratingB = votedAgainstPokemon.ranking
+
+    const { ratingA: newRatingA, ratingB: newRatingB } = eloRating(
+      ratingA,
+      ratingB,
+      30
+    )
+
+    await prisma.pokemon.update({
+      where: { id: id },
+      data: {
+        ranking: {
+          set: newRatingA
+        }
+      }
+    })
+
+    await prisma.pokemon.update({
+      where: { id: idVotedAgainst },
+      data: {
+        ranking: {
+          set: newRatingB
+        }
+      }
+    })
+
+    return votedForPokemon
+  })
 })
 
-function getTwoRandomPokemonUrls() {
-  const pokemonUrls: string[] = []
+function expectedProbabilityOfWinning(ratingA: number, ratingB: number) {
+  return (
+    (1.0 * 1.0) / (1 + 1.0 * Math.pow(10, (1.0 * (ratingA - ratingB)) / 400))
+  )
+}
+
+function eloRating(
+  ratingA: number,
+  ratingB: number,
+  k = 30,
+  winner: "a" | "b" = "a"
+) {
+  const probabilityAWins = expectedProbabilityOfWinning(ratingB, ratingA)
+  const probabilityBWins = expectedProbabilityOfWinning(ratingA, ratingB)
+
+  if (winner === "a") {
+    ratingA = ratingA + k * (1 - probabilityAWins)
+    ratingB = ratingB + k * (0 - probabilityBWins)
+  } else {
+    ratingA = ratingA + k * (0 - probabilityAWins)
+    ratingB = ratingB + k * (1 - probabilityBWins)
+  }
+  return {
+    ratingA,
+    ratingB
+  }
+}
+
+function getTwoRandomPokemonIds() {
   let firstRandomInt = _.random(1, 150)
   const secondRandomInt = _.random(1, 150)
 
   while (firstRandomInt === secondRandomInt) {
     firstRandomInt = _.random(1, 150)
   }
-  pokemonUrls.push(`https://pokeapi.co/api/v2/pokemon/${firstRandomInt}`)
-  pokemonUrls.push(`https://pokeapi.co/api/v2/pokemon/${secondRandomInt}`)
-  return pokemonUrls
+  return [firstRandomInt, secondRandomInt]
 }

@@ -6,11 +6,11 @@ import useVoteForPokemon from "../../hooks/useVoteForPokemon"
 
 interface PokemonCardProps {
   name?: string | undefined
-  imageUrl?: string | undefined
   id: number | undefined
   isVoting: boolean
   isLoadingTwoPokemon: boolean
   hasCastVote: boolean
+  idVotedAgainst: number | undefined
   setHasCastVote: Dispatch<SetStateAction<boolean>>
   setIsVoting: Dispatch<SetStateAction<boolean>>
   setPokemonVotedFor: Dispatch<SetStateAction<string>>
@@ -18,9 +18,9 @@ interface PokemonCardProps {
 
 export default function PokemonCard({
   name,
-  imageUrl,
   isLoadingTwoPokemon,
   id,
+  idVotedAgainst,
   hasCastVote,
   isVoting,
   setIsVoting,
@@ -41,6 +41,7 @@ export default function PokemonCard({
       setPokemonVotedFor(mutation?.data?.name ?? "")
     } else {
       setHasCastVote(false)
+      setPokemonVotedFor("")
     }
   }, [
     mutation.isLoading,
@@ -51,7 +52,7 @@ export default function PokemonCard({
     setPokemonVotedFor
   ])
 
-  if (isLoadingTwoPokemon || isVoting || !id || !name || !imageUrl) {
+  if (isLoadingTwoPokemon || isVoting || !id || !name || !idVotedAgainst) {
     return <SkeletonPokemonCard />
   }
 
@@ -61,7 +62,7 @@ export default function PokemonCard({
         className="flex flex-col gap-2"
         onClick={() => {
           if (!isVoting) {
-            void mutation.mutate({ id, name, image: imageUrl })
+            void mutation.mutate({ id, idVotedAgainst })
           }
         }}
       >
@@ -75,7 +76,7 @@ export default function PokemonCard({
         >
           <Image
             priority
-            src={imageUrl}
+            src={`/pokemon/${id}.png`}
             alt=""
             width={400}
             height={400}
