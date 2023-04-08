@@ -15,6 +15,12 @@ interface PokemonCardProps {
   setPokemonVotedFor: Dispatch<SetStateAction<string>>
 }
 
+function getImageUrl(id: number) {
+  return process.env.NODE_ENV === "production"
+    ? `https://d3h67ipnikmm2c.cloudfront.net/${id}.png`
+    : `/pokemon/${id}.png`
+}
+
 export default function PokemonCard({
   name,
   isLoadingTwoPokemon,
@@ -61,7 +67,7 @@ export default function PokemonCard({
         >
           <Image
             priority
-            src={`https://sharpest-pokemon.s3.ap-southeast-1.amazonaws.com/${id}.png`}
+            src={getImageUrl(id)}
             alt=""
             width={300}
             height={300}

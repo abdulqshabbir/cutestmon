@@ -26,6 +26,12 @@ const config = {
         hostname: "sharpest-pokemon.s3.ap-southeast-1.amazonaws.com",
         pathname: "/**.png",
         port: ""
+      },
+      {
+        protocol: "https",
+        hostname: "d3h67ipnikmm2c.cloudfront.net",
+        pathname: "/**.png",
+        port: ""
       }
     ]
   }
