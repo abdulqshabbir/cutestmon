@@ -1,7 +1,6 @@
-import { useEffect } from "react"
 import Image from "next/image"
 import { type Dispatch, type SetStateAction } from "react"
-import DefaultSpinner from "./Spinner"
+import { RingSpinner } from "./Spinner"
 import useVoteForPokemon from "../../hooks/useVoteForPokemon"
 
 interface PokemonCardProps {
@@ -27,30 +26,15 @@ export default function PokemonCard({
   setHasCastVote,
   setPokemonVotedFor
 }: PokemonCardProps) {
-  const mutation = useVoteForPokemon()
-
-  useEffect(() => {
-    if (mutation.isLoading) {
-      setIsVoting(true)
-    } else {
+  const mutation = useVoteForPokemon({
+    onSuccess(data) {
+      setHasCastVote(true)
+      setPokemonVotedFor(data.name)
+    },
+    onSettled() {
       setIsVoting(false)
     }
-
-    if (mutation.isSuccess) {
-      setHasCastVote(true)
-      setPokemonVotedFor(mutation?.data?.name ?? "")
-    } else {
-      setHasCastVote(false)
-      setPokemonVotedFor("")
-    }
-  }, [
-    mutation.isLoading,
-    mutation.isSuccess,
-    mutation?.data?.name,
-    setIsVoting,
-    setHasCastVote,
-    setPokemonVotedFor
-  ])
+  })
 
   if (isLoadingTwoPokemon || isVoting || !id || !name || !idVotedAgainst) {
     return <SkeletonPokemonCard />
@@ -63,6 +47,7 @@ export default function PokemonCard({
         onClick={() => {
           if (!isVoting) {
             void mutation.mutate({ id, idVotedAgainst })
+            setIsVoting(true)
           }
         }}
       >
@@ -81,8 +66,6 @@ export default function PokemonCard({
             width={300}
             height={300}
             quality={10}
-            // placeholder="blur"
-            // blurDataURL="/blur.png"
           />
         </div>
       </div>
@@ -105,7 +88,7 @@ function SkeletonPokemonCard() {
     <div className="m-4 flex flex-col">
       <div className="max-w-7/12 mb-4 flex h-8 animate-pulse self-center rounded-xl bg-gray-300"></div>
       <div className=" flex h-[300px] w-[300px] animate-pulse items-center justify-center rounded-3xl bg-gray-200 transition-all hover:bg-gray-200">
-        <DefaultSpinner />
+        <RingSpinner />
       </div>
     </div>
   )

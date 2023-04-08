@@ -8,7 +8,7 @@ import { VscRefresh } from "react-icons/vsc"
 import { AiOutlineBarChart } from "react-icons/ai"
 import { trpc } from "../utils/api"
 import PokemonCard from "../components/ui/PokemonCard"
-import DefaultSpinner from "../components/ui/Spinner"
+import { RingSpinner } from "../components/ui/Spinner"
 import Button from "../components/ui/Button"
 import toast, { Toaster } from "react-hot-toast"
 
@@ -36,7 +36,7 @@ const Home: NextPage = () => {
   }, [hasCastVote, pokemonVotedFor])
 
   if (isLoadingTwoPokemon) {
-    return <DefaultSpinner />
+    return <RingSpinner />
   }
 
   if (isTwoPokemonError) {
@@ -51,10 +51,25 @@ const Home: NextPage = () => {
           content="Vote on which pokemon you think is happiest :)"
         />
       </Head>
-      <main className="flex min-h-screen flex-col items-center justify-start">
+      <main className="flex h-screen flex-col items-center justify-start gap-4">
         <Toaster position="bottom-center" />
         <Title />
-        {!hasCastVote && (
+        {isVoting && (
+          <div
+            style={{
+              height: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <RingSpinner
+              fullScreen={false}
+              width="300px"
+            />
+          </div>
+        )}
+        {!hasCastVote && !isVoting && (
           <div className="m-4 flex flex-col sm:flex-row">
             <PokemonCard
               name={twoPokemon?.[0]?.name}
@@ -98,7 +113,7 @@ interface ButtonsProps {
 
 function Buttons({ hasCastVote, setHasCastVote }: ButtonsProps) {
   return hasCastVote ? (
-    <div className="m-4 flex flex-col items-center justify-center sm:flex-row sm:gap-8">
+    <div className="mb-4 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-8">
       <Button
         variant="secondary"
         onClick={() => {

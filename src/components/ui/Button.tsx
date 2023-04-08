@@ -1,5 +1,5 @@
 import type { MouseEventHandler } from "react"
-import DefaultSpinner from "./Spinner"
+import { RingSpinner } from "./Spinner"
 
 interface BaseButtonProps {
   children: React.ReactNode
@@ -32,7 +32,7 @@ function BaseButton({
       }}
       {...props}
     >
-      {isLoading ? <DefaultSpinner width="10px" /> : children}
+      {isLoading ? <RingSpinner width="10px" /> : children}
     </button>
   )
 }
