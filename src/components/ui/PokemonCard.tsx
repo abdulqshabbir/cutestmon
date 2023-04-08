@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import Image from "next/image"
 import { type Dispatch, type SetStateAction } from "react"
 import DefaultSpinner from "./Spinner"
