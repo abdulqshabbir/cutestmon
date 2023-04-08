@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import { type Dispatch, type SetStateAction } from "react"
 import DefaultSpinner from "./Spinner"
@@ -76,10 +76,13 @@ export default function PokemonCard({
         >
           <Image
             priority
-            src={`/pokemon/${id}.png`}
+            src={`https://sharpest-pokemon.s3.ap-southeast-1.amazonaws.com/${id}.png`}
             alt=""
-            width={400}
-            height={400}
+            width={300}
+            height={300}
+            quality={10}
+            // placeholder="blur"
+            // blurDataURL="/blur.png"
           />
         </div>
       </div>
@@ -100,8 +103,8 @@ function getTailwindClassesOnVote(hasCastVote: boolean) {
 function SkeletonPokemonCard() {
   return (
     <div className="m-4 flex flex-col">
-      <div className="max-w-7/12 mb-4 flex h-8 animate-pulse self-center rounded-xl bg-gray-200"></div>
-      <div className=" flex h-[400px] w-[400px] animate-pulse items-center justify-center rounded-3xl bg-gray-200 transition-all hover:bg-gray-200">
+      <div className="max-w-7/12 mb-4 flex h-8 animate-pulse self-center rounded-xl bg-gray-300"></div>
+      <div className=" flex h-[300px] w-[300px] animate-pulse items-center justify-center rounded-3xl bg-gray-200 transition-all hover:bg-gray-200">
         <DefaultSpinner />
       </div>
     </div>

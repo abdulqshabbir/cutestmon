@@ -20,6 +20,12 @@ const config = {
         hostname: "raw.githubusercontent.com",
         pathname: "/PokeAPI/sprites/master/sprites/pokemon/**",
         port: ""
+      },
+      {
+        protocol: "https",
+        hostname: "sharpest-pokemon.s3.ap-southeast-1.amazonaws.com",
+        pathname: "/**.png",
+        port: ""
       }
     ]
   }
