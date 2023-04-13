@@ -1,30 +1,23 @@
 import { appRouter } from "../root"
 import { describe, it, expect } from "vitest"
-import { createInnerTRPCContextForTesting } from "../trpc"
-import { mockDeep } from "vitest-mock-extended"
-import type { Pokemon } from "@prisma/client"
-import { type PrismaClient } from "@prisma/client"
-import { prisma } from "../../db"
+import { createInnerTRPCContext } from "../trpc"
 
-describe("pokemon route", async () => {
-  const mockPrisma = mockDeep<PrismaClient>()
-  const mockOutput: Pokemon[] = [
-    {
-      id: 34,
-      name: "hello",
-      ranking: 322
-    }
-  ]
+describe("pokemon.all", () => {
+  it("returns all 150 Pokemon from pokeApI", async () => {
+    const caller = appRouter.createCaller(
+      createInnerTRPCContext({ session: null })
+    )
+    const pokemon = await caller.pokemons.all()
+    expect(pokemon.length).toBe(150)
+  })
 
-  mockPrisma.pokemon.findMany.mockResolvedValue(mockOutput)
-
-  const caller = appRouter.createCaller(
-    createInnerTRPCContextForTesting({ session: null, prisma: prisma })
-  )
-
-  await caller.pokemons.all()
-
-  it("hello vitest", () => {
-    expect(1 + 1).toBe(2)
+  it("returns bulbasaur as first pokemon from pokeAPI", async () => {
+    const caller = appRouter.createCaller(
+      createInnerTRPCContext({ session: null })
+    )
+    const pokemon = await caller.pokemons.all()
+    const bulbasaur = pokemon[0]
+    expect(bulbasaur?.name).toBe("bulbasaur")
+    expect(bulbasaur?.id).toBe(1)
   })
 })

@@ -36,15 +36,7 @@ type CreateContextOptions = {
  * @see https://create.t3.gg/en/usage/trpc#-servertrpccontextts
  */
 
-export const createInnerTRPCContextForTesting = (
-  opts: CreateContextOptions
-) => {
-  return {
-    session: opts.session
-  }
-}
-
-const createInnerTRPCContext = (opts: CreateContextOptions) => {
+export const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     prisma
@@ -75,7 +67,6 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
  */
 import { initTRPC, TRPCError } from "@trpc/server"
 import superjson from "superjson"
-import type { PrismaClient } from "@prisma/client"
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
