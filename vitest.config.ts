@@ -7,6 +7,8 @@ export default defineConfig({
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   plugins: [react()],
   test: {
-    environment: "jsdom"
+    environment: "jsdom",
+    setupFiles: "./src/utils/setupTests.ts",
+    globals: true
   }
 })

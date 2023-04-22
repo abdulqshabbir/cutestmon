@@ -9,7 +9,10 @@ export const RingSpinner = ({
 }: RingSpinnerProps) => {
   if (width && !fullScreen) {
     return (
-      <div className=" flex items-center justify-center">
+      <div
+        data-testid="loading-spinner"
+        className=" flex items-center justify-center"
+      >
         <div
           className={`h-[${width}] w-[${width}] animate-spin  rounded-full border-8 border-solid border-gray-300 border-t-transparent`}
         ></div>
@@ -17,7 +20,10 @@ export const RingSpinner = ({
     )
   }
   return (
-    <div className="absolute right-1/2 bottom-1/2  translate-x-1/2 translate-y-1/2 transform ">
+    <div
+      data-testid="loading-spinner"
+      className="absolute right-1/2 bottom-1/2 translate-x-1/2 translate-y-1/2 transform "
+    >
       <div className="h-64 w-64 animate-spin  rounded-full border-8 border-solid border-gray-300 border-t-transparent"></div>
     </div>
   )
