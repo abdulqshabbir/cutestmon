@@ -1,33 +1,31 @@
-import type { MouseEventHandler } from "react"
-import { RingSpinner } from "./Spinner"
 import { twMerge } from "tailwind-merge"
+import { RingSpinner } from "./Spinner"
 
-interface BaseButtonProps {
+interface BaseAnchorProps extends React.ComponentPropsWithoutRef<"a"> {
   children: React.ReactNode
   className: string
   isLoading?: boolean
   fullWidth?: boolean
   styles?: React.CSSProperties
-  onClick: MouseEventHandler<HTMLButtonElement>
 }
 
-function BaseButton({
+function BaseAnchor({
   className,
   children,
   isLoading,
   fullWidth = false,
   styles,
-  onClick,
+  href,
   ...props
-}: BaseButtonProps) {
+}: BaseAnchorProps) {
   const baseStyles: React.CSSProperties = {
     width: fullWidth ? "100%" : "200px"
   }
 
   return (
-    <button
+    <a
       className={className}
-      onClick={onClick}
+      href={href}
       style={{
         ...baseStyles,
         ...styles
@@ -35,17 +33,16 @@ function BaseButton({
       {...props}
     >
       {isLoading ? <RingSpinner width="10px" /> : children}
-    </button>
+    </a>
   )
 }
 
-interface ButtonProps extends React.ComponentPropsWithoutRef<"button"> {
+interface AnchorProps extends React.ComponentPropsWithoutRef<"a"> {
   variant: "primary" | "secondary"
   children: React.ReactNode
   isLoading?: boolean
   fullWidth?: boolean
   styles?: React.CSSProperties
-  onClick: MouseEventHandler<HTMLButtonElement>
 }
 
 const baseStyles =
@@ -56,38 +53,33 @@ const primaryStyles = "bg-primary text-primary-foreground hover:bg-primary/90"
 const secondaryStyles =
   "hover:bg-accent hover:text-accent-foreground border-[1px] border-border"
 
-export default function Button({
-  variant,
-  children,
-  className,
-  ...rest
-}: ButtonProps) {
+export default function Anchor({ variant, children, ...rest }: AnchorProps) {
   if (variant === "primary") {
     return (
-      <BaseButton
-        className={twMerge(baseStyles, primaryStyles, className)}
+      <BaseAnchor
+        className={twMerge(baseStyles, primaryStyles)}
         {...rest}
       >
         {children}
-      </BaseButton>
+      </BaseAnchor>
     )
   }
   if (variant === "secondary") {
     return (
-      <BaseButton
-        className={twMerge(baseStyles, secondaryStyles, className)}
+      <BaseAnchor
+        className={twMerge(baseStyles, secondaryStyles)}
         {...rest}
       >
         {children}
-      </BaseButton>
+      </BaseAnchor>
     )
   }
   return (
-    <BaseButton
-      className={twMerge(baseStyles, secondaryStyles, className)}
+    <BaseAnchor
+      className={twMerge(baseStyles, secondaryStyles)}
       {...rest}
     >
       {children}
-    </BaseButton>
+    </BaseAnchor>
   )
 }

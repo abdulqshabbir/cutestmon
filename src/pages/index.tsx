@@ -2,15 +2,17 @@ import type { Dispatch, SetStateAction } from "react"
 import { useEffect } from "react"
 import { useState } from "react"
 import { type NextPage } from "next"
-import Link from "next/link"
 import Head from "next/head"
 import { VscRefresh } from "react-icons/vsc"
 import { AiOutlineBarChart } from "react-icons/ai"
 import { trpc } from "../utils/api"
-import PokemonCard from "../components/ui/PokemonCard"
+import PokemonCard from "../components/PokemonCard"
 import { RingSpinner } from "../components/ui/Spinner"
 import Button from "../components/ui/Button"
 import toast, { Toaster } from "react-hot-toast"
+import Anchor from "../components/ui/Anchor"
+import Footer from "../components/Footer"
+import Heading from "../components/ui/Heading"
 
 const Home: NextPage = () => {
   const {
@@ -51,57 +53,69 @@ const Home: NextPage = () => {
           content="Vote on which pokemon you think is happiest :)"
         />
       </Head>
-      <main className="flex h-screen flex-col items-center justify-start gap-4">
-        <Toaster position="bottom-center" />
-        <Title />
-        {isVoting && (
-          <div
-            style={{
-              height: "100%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <RingSpinner
-              fullScreen={false}
-              width="300px"
-            />
-          </div>
-        )}
-        {!hasCastVote && !isVoting && (
-          <div className="m-4 flex flex-col sm:flex-row">
-            <PokemonCard
-              name={twoPokemon?.[0]?.name}
-              isLoadingTwoPokemon={isLoadingTwoPokemon || isFetchingTwoPokemon}
-              id={twoPokemon?.[0]?.id}
-              idVotedAgainst={twoPokemon?.[1]?.id}
+      <body className="flex h-screen flex-col items-center justify-between gap-4">
+        <Toaster
+          position="bottom-center"
+          containerStyle={{
+            bottom: 80
+          }}
+        />
+        {!hasCastVote && <Title />}
+        <main>
+          {isVoting && (
+            <div
+              style={{
+                height: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <RingSpinner
+                fullScreen={false}
+                width="300px"
+              />
+            </div>
+          )}
+          {!hasCastVote && !isVoting && (
+            <div className="m-4 flex flex-col sm:flex-row">
+              <PokemonCard
+                name={twoPokemon?.[0]?.name}
+                isLoadingTwoPokemon={
+                  isLoadingTwoPokemon || isFetchingTwoPokemon
+                }
+                id={twoPokemon?.[0]?.id}
+                idVotedAgainst={twoPokemon?.[1]?.id}
+                hasCastVote={hasCastVote}
+                setHasCastVote={setHasCastVote}
+                isVoting={isVoting}
+                setIsVoting={setIsVoting}
+                setPokemonVotedFor={setPokemonVotedFor}
+              />
+              <PokemonCard
+                name={twoPokemon?.[1]?.name}
+                isLoadingTwoPokemon={
+                  isLoadingTwoPokemon || isFetchingTwoPokemon
+                }
+                id={twoPokemon?.[1]?.id}
+                idVotedAgainst={twoPokemon?.[0]?.id}
+                hasCastVote={hasCastVote}
+                setHasCastVote={setHasCastVote}
+                isVoting={isVoting}
+                setIsVoting={setIsVoting}
+                setPokemonVotedFor={setPokemonVotedFor}
+              />
+            </div>
+          )}
+          {hasCastVote && (
+            <Buttons
               hasCastVote={hasCastVote}
               setHasCastVote={setHasCastVote}
-              isVoting={isVoting}
-              setIsVoting={setIsVoting}
-              setPokemonVotedFor={setPokemonVotedFor}
             />
-            <PokemonCard
-              name={twoPokemon?.[1]?.name}
-              isLoadingTwoPokemon={isLoadingTwoPokemon || isFetchingTwoPokemon}
-              id={twoPokemon?.[1]?.id}
-              idVotedAgainst={twoPokemon?.[0]?.id}
-              hasCastVote={hasCastVote}
-              setHasCastVote={setHasCastVote}
-              isVoting={isVoting}
-              setIsVoting={setIsVoting}
-              setPokemonVotedFor={setPokemonVotedFor}
-            />
-          </div>
-        )}
-        {hasCastVote && (
-          <Buttons
-            hasCastVote={hasCastVote}
-            setHasCastVote={setHasCastVote}
-          />
-        )}
-      </main>
+          )}
+        </main>
+        <Footer />
+      </body>
     </>
   )
 }
@@ -113,7 +127,7 @@ interface ButtonsProps {
 
 function Buttons({ hasCastVote, setHasCastVote }: ButtonsProps) {
   return hasCastVote ? (
-    <div className="mb-4 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-8">
+    <div className="mb-4 flex flex-col items-center justify-center gap-4">
       <Button
         variant="secondary"
         onClick={() => {
@@ -123,22 +137,22 @@ function Buttons({ hasCastVote, setHasCastVote }: ButtonsProps) {
         <span>Vote Again</span>
         <VscRefresh />
       </Button>
-      <Link
+      <Anchor
+        variant="primary"
         href="/leaderboard"
-        className="flex items-center justify-center gap-2 rounded-lg bg-blue-300 py-4 px-8 font-bold text-white transition-all hover:scale-105"
       >
         <span>Show Results</span>
         <AiOutlineBarChart />
-      </Link>
+      </Anchor>
     </div>
   ) : null
 }
 
 function Title() {
   return (
-    <h1 className="p-0 text-lg font-bold text-gray-500 sm:m-2 sm:text-2xl">
+    <Heading variant="h1">
       Which Pokemon <span className="italic">seems happier</span>? &#128512;
-    </h1>
+    </Heading>
   )
 }
 
