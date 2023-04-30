@@ -53,14 +53,19 @@ const Home: NextPage = () => {
           content="Vote on which pokemon you think is happiest :)"
         />
       </Head>
-      <body className="flex h-screen flex-col items-center justify-between gap-4">
+      <body className="flex h-screen flex-col items-center justify-between gap-4 p-4 sm:p-0">
         <Toaster
           position="bottom-center"
           containerStyle={{
             bottom: 80
           }}
         />
-        {!hasCastVote && <Title />}
+        {!hasCastVote && (
+          <div>
+            <Title />
+            <Subtitle />
+          </div>
+        )}
         <main>
           {isVoting && (
             <div
@@ -150,8 +155,24 @@ function Buttons({ hasCastVote, setHasCastVote }: ButtonsProps) {
 
 function Title() {
   return (
-    <Heading variant="h1">
-      Which Pokemon <span className="italic">seems happier</span>? &#128512;
+    <Heading
+      as="h1"
+      className="mt-2 text-center md:mt-8"
+    >
+      Cutest Pokemon
+    </Heading>
+  )
+}
+
+function Subtitle() {
+  return (
+    <Heading
+      as="h2"
+      size="md"
+      className="max-w-md text-center lg:max-w-none"
+    >
+      Decide &#8212; once and for all &#8212; which Pokemon is the cutest of
+      them all.
     </Heading>
   )
 }
