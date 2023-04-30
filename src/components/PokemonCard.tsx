@@ -1,7 +1,7 @@
 import Image from "next/image"
 import { type Dispatch, type SetStateAction } from "react"
-import { RingSpinner } from "./Spinner"
-import useVoteForPokemon from "../../hooks/useVoteForPokemon"
+import { RingSpinner } from "./ui/Spinner"
+import useVoteForPokemon from "../hooks/useVoteForPokemon"
 
 interface PokemonCardProps {
   name?: string | undefined
@@ -84,7 +84,7 @@ function getTailwindClassesOnVote(hasCastVote: boolean) {
   if (hasCastVote) {
     classes += "bg-gray-200 opacity-30 pointer-events-none"
   } else {
-    classes += "hover:scale-105 hover:cursor-pointer"
+    classes += "hover:bg-primary/80 hover:cursor-pointer"
   }
   return classes
 }
