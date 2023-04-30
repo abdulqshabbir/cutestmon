@@ -3,7 +3,7 @@ import React from "react"
 
 const Footer: FC = ({}) => {
   return (
-    <div className=" flex h-16 w-full items-center justify-center border-t border-border py-2 px-2 text-muted-foreground md:py-0 md:px-0">
+    <div className="flex h-16 w-full items-center justify-center border-t border-border py-4 text-center text-muted-foreground md:py-0 md:py-0 md:px-0">
       <p>
         Built by{" "}
         <span className="font-medium underline">
