@@ -51,6 +51,7 @@ export const pokemonRouter = createTRPCRouter({
         nextCursor
       }
     }),
+
   twoRandom: publicProcedure.query(async () => {
     const [idFirst, idSecond] = getTwoRandomPokemonIds()
 
@@ -132,6 +133,15 @@ export const pokemonRouter = createTRPCRouter({
     })
 
     return votedForPokemon
+  }),
+
+  topThree: publicProcedure.query(async () => {
+    return await prisma.pokemon.findMany({
+      orderBy: {
+        ranking: "desc"
+      },
+      take: 3
+    })
   })
 })
 
