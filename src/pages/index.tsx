@@ -14,6 +14,8 @@ import Anchor from "../components/ui/Anchor"
 import Footer from "../components/Footer"
 import Heading from "../components/ui/Heading"
 import { MUTED_FOREGROUND, PRIMARY, SECONDARY } from "../styles/colors"
+import { twMerge } from "tailwind-merge"
+import clsx from "clsx"
 
 const Home: NextPage = () => {
   const {
@@ -61,7 +63,7 @@ const Home: NextPage = () => {
           content="Vote on which pokemon you think is happiest :)"
         />
       </Head>
-      <body className="flex h-screen flex-col items-center justify-between gap-4 p-4 sm:p-0">
+      <body className="flex h-screen flex-col items-center justify-between gap-4 sm:p-0">
         <Toaster
           position="bottom-center"
           containerStyle={{
@@ -74,7 +76,13 @@ const Home: NextPage = () => {
             <Subtitle />
           </div>
         )}
-        <main>
+        <main
+          className={twMerge(
+            clsx({
+              "relative top-[calc(50%-4rem)]": hasCastVote
+            })
+          )}
+        >
           {isVoting && (
             <div
               style={{
