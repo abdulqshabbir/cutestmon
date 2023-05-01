@@ -13,6 +13,7 @@ import toast, { Toaster } from "react-hot-toast"
 import Anchor from "../components/ui/Anchor"
 import Footer from "../components/Footer"
 import Heading from "../components/ui/Heading"
+import { MUTED_FOREGROUND, PRIMARY, SECONDARY } from "../styles/colors"
 
 const Home: NextPage = () => {
   const {
@@ -32,7 +33,14 @@ const Home: NextPage = () => {
   useEffect(() => {
     if (hasCastVote) {
       toast.success("You voted " + pokemonVotedFor + " is happier!", {
-        duration: 3000
+        duration: 3000,
+        style: {
+          color: MUTED_FOREGROUND
+        },
+        iconTheme: {
+          primary: PRIMARY,
+          secondary: SECONDARY
+        }
       })
     }
   }, [hasCastVote, pokemonVotedFor])
