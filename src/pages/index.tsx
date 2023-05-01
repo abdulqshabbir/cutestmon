@@ -74,7 +74,7 @@ const Home: NextPage = () => {
         <main
           className={twMerge(
             clsx({
-              "relative top-[calc(50%-4rem)]": hasCastVote
+              "relative top-[calc(50%-80px)]": hasCastVote
             })
           )}
         >
@@ -170,7 +170,7 @@ function Title() {
       as="h1"
       className="mt-2 text-center md:mt-8"
     >
-      Cutest Pokemon
+      Cutest Pok&eacute;mon
     </Heading>
   )
 }
