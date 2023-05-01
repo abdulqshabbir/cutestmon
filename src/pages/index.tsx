@@ -64,12 +64,7 @@ const Home: NextPage = () => {
         />
       </Head>
       <body className="flex h-screen flex-col items-center justify-between gap-4 sm:p-0">
-        <Toaster
-          position="bottom-center"
-          containerStyle={{
-            bottom: 80
-          }}
-        />
+        <Toaster position="top-center" />
         {!hasCastVote && (
           <div>
             <Title />
