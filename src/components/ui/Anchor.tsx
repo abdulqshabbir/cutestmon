@@ -19,7 +19,7 @@ function BaseAnchor({
   ...props
 }: BaseAnchorProps) {
   const baseStyles: React.CSSProperties = {
-    width: fullWidth ? "100%" : "200px"
+    width: fullWidth ? "100%" : "250px"
   }
 
   return (
@@ -46,7 +46,7 @@ interface AnchorProps extends React.ComponentPropsWithoutRef<"a"> {
 }
 
 const baseStyles =
-  "inline-flex gap-1 items-center justify-center text-sm font-normal transition-colors disabled:opacity-50 disabled:pointer-events-none h-12 px-8 rounded-md"
+  "inline-flex gap-1 items-center justify-center text-sm font-normal transition-colors disabled:opacity-50 disabled:pointer-events-none h-14 px-8 rounded-md"
 
 const primaryStyles = "bg-primary text-primary-foreground hover:bg-primary/90"
 

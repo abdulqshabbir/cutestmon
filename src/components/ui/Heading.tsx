@@ -20,8 +20,8 @@ const Heading: FC<HeadingProps> = ({
 }) => {
   const sizeStyles: Record<"sm" | "md" | "lg", string> = {
     lg: "text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:text-6xl lg:leading-[1.1]",
-    md: "text-lg text-muted-foreground md:text-xl lg:text-xl",
-    sm: "text-md text-muted-foreground"
+    md: "text-lg sm:text-xl md:text-2xl lg:text-3xl",
+    sm: "text-md"
   }
 
   const variantStyles: Record<"default" | "muted", string> = {

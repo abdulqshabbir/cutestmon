@@ -13,6 +13,9 @@ import toast, { Toaster } from "react-hot-toast"
 import Anchor from "../components/ui/Anchor"
 import Footer from "../components/Footer"
 import Heading from "../components/ui/Heading"
+import { MUTED_FOREGROUND, PRIMARY, SECONDARY } from "../styles/colors"
+import { twMerge } from "tailwind-merge"
+import clsx from "clsx"
 
 const Home: NextPage = () => {
   const {
@@ -32,7 +35,14 @@ const Home: NextPage = () => {
   useEffect(() => {
     if (hasCastVote) {
       toast.success("You voted " + pokemonVotedFor + " is happier!", {
-        duration: 3000
+        duration: 3000,
+        style: {
+          color: MUTED_FOREGROUND
+        },
+        iconTheme: {
+          primary: PRIMARY,
+          secondary: SECONDARY
+        }
       })
     }
   }, [hasCastVote, pokemonVotedFor])
@@ -53,20 +63,21 @@ const Home: NextPage = () => {
           content="Vote on which pokemon you think is happiest :)"
         />
       </Head>
-      <body className="flex h-screen flex-col items-center justify-between gap-4 p-4 sm:p-0">
-        <Toaster
-          position="bottom-center"
-          containerStyle={{
-            bottom: 80
-          }}
-        />
+      <body className="flex h-screen flex-col items-center justify-between gap-4 sm:p-0">
+        <Toaster position="top-center" />
         {!hasCastVote && (
           <div>
             <Title />
             <Subtitle />
           </div>
         )}
-        <main>
+        <main
+          className={twMerge(
+            clsx({
+              "relative top-[calc(50%-80px)]": hasCastVote
+            })
+          )}
+        >
           {isVoting && (
             <div
               style={{
@@ -159,7 +170,7 @@ function Title() {
       as="h1"
       className="mt-2 text-center md:mt-8"
     >
-      Cutest Pokemon
+      Cutest Pok&eacute;mon
     </Heading>
   )
 }
