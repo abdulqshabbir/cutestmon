@@ -1,0 +1,23 @@
+.trapezoid-first-place {
+  border-bottom: 20px solid #fef3c7;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  height: 0;
+  width: 96px;
+}
+
+.trapezoid-second-place {
+  border-bottom: 20px solid #f1f5f9;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  height: 0;
+  width: 96px;
+}
+
+.trapezoid-third-place {
+  border-bottom: 20px solid #ca8a04;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  height: 0;
+  width: 96px;
+}

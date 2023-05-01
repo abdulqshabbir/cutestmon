@@ -35,12 +35,11 @@ export default function Leaderboard() {
       <Heading
         as="h1"
         size="lg"
-        className="mb-8 text-center"
+        className="mb-2 text-center"
       >
         Pokemon Leaderboard
       </Heading>
       <TopThreePokemon />
-      <div className="mb-2 flex justify-between"></div>
       <table className="w-full">
         <tbody className="rounded-lg border-2 border-gray-50">
           {pokemons.map((pokemon, i) => (

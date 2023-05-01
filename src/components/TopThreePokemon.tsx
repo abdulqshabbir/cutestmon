@@ -3,6 +3,7 @@ import { trpc } from "../utils/api"
 import { RingSpinner } from "./ui/Spinner"
 import { cn } from "../utils/cn"
 import { useState } from "react"
+import styles from "./TopThreePokemon.module.css"
 
 export default function TopThreePokemon() {
   const { data, isError, isLoading } = trpc.pokemons.topThree.useQuery()
@@ -70,7 +71,7 @@ export default function TopThreePokemon() {
           All Time
         </div>
       </div>
-      <div className="mx-0 flex h-36 w-full flex-row justify-between md:px-16">
+      <div className="mx-0 flex h-36 w-full flex-row justify-center gap-8 md:px-16">
         <p className="self-center">
           <Image
             src={`/pokemon/${secondCutest.id}.png`}
@@ -102,6 +103,32 @@ export default function TopThreePokemon() {
           <p className={pokemonNameStyles}>{thridCutest?.name}</p>
         </p>
       </div>
+      <Podium />
     </>
+  )
+}
+
+function Podium() {
+  return (
+    <div className="flex flex-row items-end justify-center">
+      <div className="flex flex-col items-center justify-center">
+        <div className={`${styles?.["trapezoid-second-place"] ?? ""}`}></div>
+        <div className="relative flex h-24 w-24 items-start justify-center bg-slate-200 pt-2">
+          <p className="text-center align-bottom text-slate-500">2nd</p>
+        </div>
+      </div>
+      <div className="flex flex-col items-center justify-center">
+        <div className={`${styles?.["trapezoid-first-place"] ?? ""}`}></div>
+        <div className="relative flex h-36 w-24 items-start justify-center bg-amber-200 pt-2">
+          <p className="text-center text-slate-500">1st</p>
+        </div>
+      </div>
+      <div className="flex flex-col items-center justify-center">
+        <div className={`${styles?.["trapezoid-third-place"] ?? ""}`}></div>
+        <div className="relative flex h-20 w-24 items-start  justify-center bg-amber-600 pt-2">
+          <p className="text-center text-slate-900">3rd</p>
+        </div>
+      </div>
+    </div>
   )
 }
