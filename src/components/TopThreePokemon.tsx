@@ -1,9 +1,12 @@
 import Image from "next/image"
 import { trpc } from "../utils/api"
 import { RingSpinner } from "./ui/Spinner"
+import { cn } from "../utils/cn"
+import { useState } from "react"
 
 export default function TopThreePokemon() {
   const { data, isError, isLoading } = trpc.pokemons.topThree.useQuery()
+  const [active, setActive] = useState("week")
 
   if (isLoading) {
     return <RingSpinner />
@@ -21,23 +24,53 @@ export default function TopThreePokemon() {
   const thridCutest = data[2]
 
   const imageStyles =
-    "mx-auto rounded-full bg-gray-100 p-2 border-4 border-purple-100"
+    "mx-auto rounded-full bg-gray-100 p-2 border-4 border-primary/10"
 
   const leaderboardButtonStyles =
-    "py-1 px-2 hover:cursor-pointer hover:bg-white rounded-md"
+    "py-1 px-2 rounded-md hover:bg-accent hover:text-accent-foreground hover:cursor-pointer"
 
   const pokemonNameStyles = "text-center text-sm text-slate-400"
 
+  const activeStyles = "bg-accent text-accent-foreground"
+
   return (
     <>
-      <div className="mx-8 mb-4 flex justify-between rounded-md bg-purple-100 px-4 py-2 text-purple-300">
-        <div className={leaderboardButtonStyles}>Today</div>
-        <div className={leaderboardButtonStyles + " text-purple-600"}>
+      <div className="mb-4 flex justify-between rounded-md bg-primary/80 px-4 py-2 text-primary-foreground">
+        <div
+          className={cn({
+            [leaderboardButtonStyles]: true,
+            [activeStyles]: active === "today"
+          })}
+          onClick={() => {
+            setActive("today")
+          }}
+        >
+          Today
+        </div>
+        <div
+          className={cn({
+            [leaderboardButtonStyles]: true,
+            [activeStyles]: active === "week"
+          })}
+          onClick={() => {
+            setActive("week")
+          }}
+        >
           This Week
         </div>
-        <div className={leaderboardButtonStyles}>All Time</div>
+        <div
+          className={cn({
+            [leaderboardButtonStyles]: true,
+            [activeStyles]: active === "allTime"
+          })}
+          onClick={() => {
+            setActive("allTime")
+          }}
+        >
+          All Time
+        </div>
       </div>
-      <div className="mx-auto flex h-36 w-96 flex-row justify-between ">
+      <div className="mx-0 flex h-36 w-full flex-row justify-between md:px-16">
         <p className="self-center">
           <Image
             src={`/pokemon/${secondCutest.id}.png`}

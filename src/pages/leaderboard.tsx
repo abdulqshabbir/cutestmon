@@ -4,6 +4,7 @@ import Image from "next/image"
 import Button from "../components/ui/Button"
 import { RingSpinner } from "../components/ui/Spinner"
 import TopThreePokemon from "../components/TopThreePokemon"
+import Heading from "../components/ui/Heading"
 
 export default function Leaderboard() {
   const {
@@ -30,10 +31,14 @@ export default function Leaderboard() {
   const pokemons = data.pages.flatMap((page) => page.pokemons)
 
   return (
-    <div className="mx-auto mt-8 max-w-md text-gray-600">
-      <h1 className="mb-4 text-center font-bold text-slate-500">
+    <div className="mx-auto mt-8 max-w-md">
+      <Heading
+        as="h1"
+        size="lg"
+        className="mb-8 text-center"
+      >
         Pokemon Leaderboard
-      </h1>
+      </Heading>
       <TopThreePokemon />
       <div className="mb-2 flex justify-between"></div>
       <table className="w-full">
