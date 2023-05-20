@@ -23,7 +23,7 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.mjs",
-    "prisma/seed.js"
+    "prisma/seed.mjs"
   ],
   "exclude": ["node_modules"]
 }

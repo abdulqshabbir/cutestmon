@@ -1,12 +1,13 @@
-const { PrismaClient } = require("@prisma/client")
+import { PrismaClient } from "@prisma/client"
+import fetch from "node-fetch"
 
 const prisma = new PrismaClient()
 
 async function main() {
   const pokemonUrls = getAllPokemonUrls()
-  const pokemonsFromApi = (await Promise.all([
+  const pokemonsFromApi = await Promise.all([
     ...pokemonUrls.map((url) => fetch(url).then((res) => res.json()))
-  ]))
+  ])
 
   await prisma.pokemon.createMany({
     data: pokemonsFromApi.map((p) => {
