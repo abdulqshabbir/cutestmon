@@ -95,6 +95,7 @@ const Home: NextPage = () => {
           )}
           {!hasCastVote && !isVoting && (
             <div className="m-4 flex flex-col sm:flex-row">
+              {/* test */}
               <PokemonCard
                 name={twoPokemon?.[0]?.name}
                 isLoadingTwoPokemon={
