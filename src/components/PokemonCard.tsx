@@ -10,6 +10,7 @@ interface PokemonCardProps {
   isLoadingTwoPokemon: boolean
   hasCastVote: boolean
   idVotedAgainst: number | undefined
+  blob: unknown
   setHasCastVote: Dispatch<SetStateAction<boolean>>
   setIsVoting: Dispatch<SetStateAction<boolean>>
   setPokemonVotedFor: Dispatch<SetStateAction<string>>
@@ -23,6 +24,7 @@ function getImageUrl(id: number) {
 
 export default function PokemonCard({
   name,
+  blob,
   isLoadingTwoPokemon,
   id,
   idVotedAgainst,
@@ -65,13 +67,12 @@ export default function PokemonCard({
             hasCastVote
           )}`}
         >
-          <Image
-            priority
-            src={getImageUrl(id)}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`data:image/png;base64, ${blob as string}`}
             alt=""
             width={300}
             height={300}
-            quality={10}
           />
         </div>
       </div>

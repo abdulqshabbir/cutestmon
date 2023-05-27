@@ -97,6 +97,7 @@ const Home: NextPage = () => {
             <div className="m-4 flex flex-col sm:flex-row">
               <PokemonCard
                 name={twoPokemon?.[0]?.name}
+                blob={twoPokemon?.[0]?.blob}
                 isLoadingTwoPokemon={
                   isLoadingTwoPokemon || isFetchingTwoPokemon
                 }
@@ -110,6 +111,7 @@ const Home: NextPage = () => {
               />
               <PokemonCard
                 name={twoPokemon?.[1]?.name}
+                blob={twoPokemon?.[1]?.blob}
                 isLoadingTwoPokemon={
                   isLoadingTwoPokemon || isFetchingTwoPokemon
                 }

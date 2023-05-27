@@ -3,10 +3,17 @@ import { createTRPCRouter, publicProcedure } from "../trpc"
 import { TRPCError } from "@trpc/server"
 import * as _ from "lodash"
 import { prisma } from "../../db"
+import { Redis } from "@upstash/redis"
+import { env } from "../../../env.mjs"
 
 const voteByIdInput = z.object({
   id: z.number(),
   idVotedAgainst: z.number()
+})
+
+const redis = new Redis({
+  url: env.UPSTASH_REDIS_REST_URL,
+  token: env.UPSTASH_REDIS_REST_TOKEN
 })
 
 export const pokemonRouter = createTRPCRouter({
@@ -68,7 +75,24 @@ export const pokemonRouter = createTRPCRouter({
       }
     })
 
-    return pokemon
+    const blob1 = await redis.get(String(idFirst))
+    const blob2 = await redis.get(String(idSecond))
+
+    const pokemonWithBlobs = pokemon.map((p) => {
+      if (p.id === idFirst) {
+        return {
+          ...p,
+          blob: blob1
+        }
+      } else if (p.id === idSecond) {
+        return {
+          ...p,
+          blob: blob2
+        }
+      }
+    })
+
+    return pokemonWithBlobs
   }),
 
   voteById: publicProcedure.input(voteByIdInput).mutation(async (req) => {
