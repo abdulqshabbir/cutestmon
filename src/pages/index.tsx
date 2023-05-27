@@ -63,7 +63,7 @@ const Home: NextPage = () => {
           content="Vote on which pokemon you think is happiest :)"
         />
       </Head>
-      <body className="flex h-screen flex-col items-center justify-between gap-4 sm:p-0">
+      <div className="flex h-screen flex-col items-center justify-between gap-4 sm:p-0">
         <Toaster position="top-center" />
         {!hasCastVote && (
           <div>
@@ -131,7 +131,7 @@ const Home: NextPage = () => {
           )}
         </main>
         <Footer />
-      </body>
+      </div>
     </>
   )
 }
