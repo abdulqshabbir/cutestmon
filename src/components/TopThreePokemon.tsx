@@ -72,7 +72,7 @@ export default function TopThreePokemon() {
         </div>
       </div>
       <div className="mx-0 flex h-36 w-full flex-row justify-center gap-8 md:px-16">
-        <p className="self-center">
+        <div className="self-center">
           <Image
             src={`/pokemon/${secondCutest.id}.png`}
             width={80}
@@ -81,8 +81,8 @@ export default function TopThreePokemon() {
             className={imageStyles}
           />
           <p className={pokemonNameStyles}>{secondCutest?.name}</p>
-        </p>
-        <p className="self-top">
+        </div>
+        <div className="self-top">
           <Image
             src={`/pokemon/${cutest.id}.png`}
             width={80}
@@ -91,8 +91,8 @@ export default function TopThreePokemon() {
             className={imageStyles}
           />
           <p className={pokemonNameStyles}>{cutest?.name}</p>
-        </p>
-        <p className="self-center">
+        </div>
+        <div className="self-center">
           <Image
             src={`/pokemon/${thridCutest.id}.png`}
             width={80}
@@ -101,7 +101,7 @@ export default function TopThreePokemon() {
             className={imageStyles}
           />
           <p className={pokemonNameStyles}>{thridCutest?.name}</p>
-        </p>
+        </div>
       </div>
       <Podium />
     </>
