@@ -75,3 +75,10 @@ model Pokemon {
     name        String
     ranking     Float @default(1000.0)
 }
+
+model Vote {
+    id          Int @id @default(autoincrement())
+    voteFor     Int
+    voteAgainst Int
+    votedAt     DateTime @default(now())
+}

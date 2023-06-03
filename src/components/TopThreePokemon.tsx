@@ -2,12 +2,17 @@ import Image from "next/image"
 import { trpc } from "../utils/api"
 import { RingSpinner } from "./ui/Spinner"
 import { cn } from "../utils/cn"
-import { useState } from "react"
 import styles from "./TopThreePokemon.module.css"
+import type { LeaderboardTimeSpan } from "../pages/leaderboard"
 
-export default function TopThreePokemon() {
+export default function TopThreePokemon({
+  setLeaderBoardTimeSpan,
+  leaderboardTimeSpan
+}: {
+  setLeaderBoardTimeSpan: (time: LeaderboardTimeSpan) => void
+  leaderboardTimeSpan: LeaderboardTimeSpan
+}) {
   const { data, isError, isLoading } = trpc.pokemons.topThree.useQuery()
-  const [active, setActive] = useState("week")
 
   if (isLoading) {
     return <RingSpinner />
@@ -40,10 +45,10 @@ export default function TopThreePokemon() {
         <div
           className={cn({
             [leaderboardButtonStyles]: true,
-            [activeStyles]: active === "today"
+            [activeStyles]: leaderboardTimeSpan === "today"
           })}
           onClick={() => {
-            setActive("today")
+            setLeaderBoardTimeSpan("today")
           }}
         >
           Today
@@ -51,59 +56,63 @@ export default function TopThreePokemon() {
         <div
           className={cn({
             [leaderboardButtonStyles]: true,
-            [activeStyles]: active === "week"
+            [activeStyles]: leaderboardTimeSpan === "allTime"
           })}
           onClick={() => {
-            setActive("week")
-          }}
-        >
-          This Week
-        </div>
-        <div
-          className={cn({
-            [leaderboardButtonStyles]: true,
-            [activeStyles]: active === "allTime"
-          })}
-          onClick={() => {
-            setActive("allTime")
+            setLeaderBoardTimeSpan("allTime")
           }}
         >
           All Time
         </div>
-      </div>
-      <div className="mx-0 flex h-36 w-full flex-row justify-center gap-8 md:px-16">
-        <div className="self-center">
-          <Image
-            src={`/pokemon/${secondCutest.id}.png`}
-            width={80}
-            height={80}
-            alt="Pokemon avatar"
-            className={imageStyles}
-          />
-          <p className={pokemonNameStyles}>{secondCutest?.name}</p>
-        </div>
-        <div className="self-top">
-          <Image
-            src={`/pokemon/${cutest.id}.png`}
-            width={80}
-            height={80}
-            alt="Pokemon avatar"
-            className={imageStyles}
-          />
-          <p className={pokemonNameStyles}>{cutest?.name}</p>
-        </div>
-        <div className="self-center">
-          <Image
-            src={`/pokemon/${thridCutest.id}.png`}
-            width={80}
-            height={80}
-            alt="Pokemon avatar"
-            className={imageStyles}
-          />
-          <p className={pokemonNameStyles}>{thridCutest?.name}</p>
+        <div
+          className={cn({
+            [leaderboardButtonStyles]: true,
+            [activeStyles]: leaderboardTimeSpan === "week"
+          })}
+          onClick={() => {
+            setLeaderBoardTimeSpan("week")
+          }}
+        >
+          This Week
         </div>
       </div>
-      <Podium />
+      {leaderboardTimeSpan === "allTime" && (
+        <>
+          <div className="mx-0 flex h-36 w-full flex-row justify-center gap-8 md:px-16">
+            <div className="self-center">
+              <Image
+                src={`/pokemon/${secondCutest.id}.png`}
+                width={80}
+                height={80}
+                alt="Pokemon avatar"
+                className={imageStyles}
+              />
+              <p className={pokemonNameStyles}>{secondCutest?.name}</p>
+            </div>
+            <div className="self-top">
+              <Image
+                src={`/pokemon/${cutest.id}.png`}
+                width={80}
+                height={80}
+                alt="Pokemon avatar"
+                className={imageStyles}
+              />
+              <p className={pokemonNameStyles}>{cutest?.name}</p>
+            </div>
+            <div className="self-center">
+              <Image
+                src={`/pokemon/${thridCutest.id}.png`}
+                width={80}
+                height={80}
+                alt="Pokemon avatar"
+                className={imageStyles}
+              />
+              <p className={pokemonNameStyles}>{thridCutest?.name}</p>
+            </div>
+          </div>
+          <Podium />
+        </>
+      )}
     </>
   )
 }

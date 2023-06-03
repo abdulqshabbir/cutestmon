@@ -13,14 +13,11 @@ function BaseAnchor({
   className,
   children,
   isLoading,
-  fullWidth = false,
   styles,
   href,
   ...props
 }: BaseAnchorProps) {
-  const baseStyles: React.CSSProperties = {
-    width: fullWidth ? "100%" : "250px"
-  }
+  const baseStyles: React.CSSProperties = {}
 
   return (
     <a
@@ -43,21 +40,27 @@ interface AnchorProps extends React.ComponentPropsWithoutRef<"a"> {
   isLoading?: boolean
   fullWidth?: boolean
   styles?: React.CSSProperties
+  className?: string
 }
 
 const baseStyles =
-  "inline-flex gap-1 items-center justify-center text-sm font-normal transition-colors disabled:opacity-50 disabled:pointer-events-none h-14 px-8 rounded-md"
+  "inline-flex gap-1 items-center justify-center text-sm font-normal transition-colors disabled:opacity-50 disabled:pointer-events-none h-14 px-8 rounded-md w-[250px]"
 
 const primaryStyles = "bg-primary text-primary-foreground hover:bg-primary/90"
 
 const secondaryStyles =
   "hover:bg-accent hover:text-accent-foreground border-[1px] border-border"
 
-export default function Anchor({ variant, children, ...rest }: AnchorProps) {
+export default function Anchor({
+  variant,
+  children,
+  className,
+  ...rest
+}: AnchorProps) {
   if (variant === "primary") {
     return (
       <BaseAnchor
-        className={twMerge(baseStyles, primaryStyles)}
+        className={twMerge(baseStyles, primaryStyles, className)}
         {...rest}
       >
         {children}
@@ -67,7 +70,7 @@ export default function Anchor({ variant, children, ...rest }: AnchorProps) {
   if (variant === "secondary") {
     return (
       <BaseAnchor
-        className={twMerge(baseStyles, secondaryStyles)}
+        className={twMerge(baseStyles, secondaryStyles, className)}
         {...rest}
       >
         {children}
@@ -76,7 +79,7 @@ export default function Anchor({ variant, children, ...rest }: AnchorProps) {
   }
   return (
     <BaseAnchor
-      className={twMerge(baseStyles, secondaryStyles)}
+      className={twMerge(baseStyles, secondaryStyles, className)}
       {...rest}
     >
       {children}

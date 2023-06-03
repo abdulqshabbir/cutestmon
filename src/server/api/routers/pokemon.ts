@@ -1,7 +1,7 @@
 import { z } from "zod"
 import { createTRPCRouter, publicProcedure } from "../trpc"
 import { TRPCError } from "@trpc/server"
-import * as _ from "lodash"
+import _ from "lodash"
 import { prisma } from "../../db"
 import { Redis } from "@upstash/redis"
 import { env } from "../../../env.mjs"
@@ -156,6 +156,14 @@ export const pokemonRouter = createTRPCRouter({
       }
     })
 
+    await prisma.vote.create({
+      data: {
+        voteFor: votedForPokemon.id,
+        voteAgainst: votedAgainstPokemon.id,
+        votedAt: new Date()
+      }
+    })
+
     return votedForPokemon
   }),
 
@@ -166,7 +174,75 @@ export const pokemonRouter = createTRPCRouter({
       },
       take: 3
     })
-  })
+  }),
+  getWeeklyRanking: publicProcedure
+    .input(
+      z.object({
+        take: z.number().min(1).max(150).nullish(),
+        cursor: z.number().nullish()
+      })
+    )
+    .query(async ({ input }) => {
+      const limit = input.take ?? 30
+      const d = new Date()
+      d.setDate(d.getDate() - 7)
+      const votes = await prisma.vote.findMany({
+        where: {
+          votedAt: {
+            gte: new Date(d.getMilliseconds()),
+            lte: new Date()
+          }
+        }
+      })
+      const pokemonIdToVotes: Record<string, number> = {}
+      const pokemonInPastWeekLeaderboard: number[] = []
+
+      for (const v of votes) {
+        const idFor = String(v.voteFor)
+        if (!(v.voteFor in pokemonIdToVotes)) {
+          pokemonIdToVotes[idFor] = 1
+          pokemonInPastWeekLeaderboard.push(v.voteFor)
+        } else {
+          pokemonIdToVotes[idFor] += 1
+        }
+        const idAgainst = String(v.voteAgainst)
+        if (!(v.voteAgainst in pokemonIdToVotes)) {
+          pokemonIdToVotes[idAgainst] = -1
+          pokemonInPastWeekLeaderboard.push(v.voteAgainst)
+        } else {
+          pokemonIdToVotes[idAgainst] -= 1
+        }
+      }
+
+      const pokemonInWeeklyLeaderboard = await prisma.pokemon.findMany({
+        where: {
+          id: {
+            in: pokemonInPastWeekLeaderboard
+          }
+        },
+        take: limit + 1,
+        orderBy: [
+          {
+            ranking: "desc"
+          }
+        ],
+        cursor: input?.cursor ? { id: input.cursor } : undefined
+      })
+
+      let nextCursor = undefined
+      if (pokemonInWeeklyLeaderboard.length > limit) {
+        const nextPokemonCursor = pokemonInWeeklyLeaderboard.pop()
+        nextCursor = nextPokemonCursor?.id
+      }
+
+      return {
+        pokemons: pokemonInWeeklyLeaderboard.map((p) => ({
+          ...p,
+          aggregateVotes: pokemonIdToVotes[p.id]
+        })),
+        nextCursor
+      }
+    })
 })
 
 function expectedProbabilityOfWinning(ratingA: number, ratingB: number) {
