@@ -34,7 +34,7 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     if (hasCastVote) {
-      toast.success("You voted " + pokemonVotedFor + " is happier!", {
+      toast.success("You voted " + pokemonVotedFor + " is cuter!", {
         duration: 3000,
         style: {
           color: MUTED_FOREGROUND
