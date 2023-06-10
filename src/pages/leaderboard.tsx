@@ -40,7 +40,7 @@ export default function Leaderboard() {
     hasNextPage: hasNextWeeklyPokemonPage
   } = trpc.pokemons.getWeeklyRanking.useInfiniteQuery(
     {
-      take: 5
+      take: 30
     },
     { getNextPageParam: (lastPage) => lastPage.nextCursor }
   )
@@ -241,7 +241,7 @@ function HasMorePokemonButton({
           className="mt-4 mb-8 w-full"
           fullWidth
         >
-          Fetch Next 5 Pokemon
+          Fetch Next 30 Pokemon
         </Button>
       </div>
     )
