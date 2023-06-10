@@ -8,6 +8,7 @@ import TopThreePokemon from "../components/TopThreePokemon"
 import Heading from "../components/ui/Heading"
 import { useState } from "react"
 import { AiOutlineCaretUp, AiOutlineCaretDown } from "react-icons/ai"
+import { BsDashLg } from "react-icons/bs"
 import Anchor from "../components/ui/Anchor"
 
 export type LeaderboardTimeSpan = "today" | "week" | "allTime"
@@ -133,18 +134,7 @@ export default function Leaderboard() {
                       <td className="text-sm font-light text-slate-400">
                         {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
                         {/* @ts-ignore */}
-                        {(pokemon as WeeklyLeaderboardPokemons[number])
-                          ?.aggregateVotes > 0 ? (
-                          <AiOutlineCaretUp
-                            className="text-green-500"
-                            size={30}
-                          />
-                        ) : (
-                          <AiOutlineCaretDown
-                            className="text-red-500"
-                            size={30}
-                          />
-                        )}
+                        <LeaderboardTrendIcon pokemon={pokemon} />
                       </td>
                     ) : (
                       <td className="text-sm font-light text-slate-400">
@@ -171,6 +161,34 @@ export default function Leaderboard() {
         </>
       )}
     </div>
+  )
+}
+
+function LeaderboardTrendIcon({
+  pokemon
+}: {
+  pokemon: WeeklyLeaderboardPokemons[number]
+}) {
+  if (pokemon?.aggregateVotes === 0) {
+    return (
+      <BsDashLg
+        className="text-slate-400"
+        size={30}
+      />
+    )
+  } else if (pokemon?.aggregateVotes && pokemon.aggregateVotes > 0) {
+    return (
+      <AiOutlineCaretUp
+        className="text-green-500"
+        size={30}
+      />
+    )
+  }
+  return (
+    <AiOutlineCaretDown
+      className="text-red-500"
+      size={30}
+    />
   )
 }
 
