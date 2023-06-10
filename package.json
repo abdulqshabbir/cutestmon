@@ -8,7 +8,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "postinstall": "prisma migrate deploy && prisma generate",
+    "postinstall": "prisma migrate resolve --applied 20230527035447_reset_db && prisma migrate deploy && prisma generate",
     "lint": "next lint",
     "start": "next start"
   },
