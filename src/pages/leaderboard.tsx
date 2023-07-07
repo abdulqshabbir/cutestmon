@@ -17,6 +17,8 @@ type AllTimeLeaderboardPokemons =
   RouterOutputs["pokemons"]["allInfinite"]["pokemons"]
 type WeeklyLeaderboardPokemons =
   RouterOutputs["pokemons"]["getWeeklyRanking"]["pokemons"]
+type DailyLeaderboardPokemons =
+  RouterOutputs["pokemons"]["getDailyRanking"]["pokemons"]
 
 export default function Leaderboard() {
   const {
@@ -45,10 +47,29 @@ export default function Leaderboard() {
     { getNextPageParam: (lastPage) => lastPage.nextCursor }
   )
 
+  const {
+    data: dailyData,
+    isLoading: isLoadingDailyPokemons,
+    fetchNextPage: fetchNextDailyPokemonPage,
+    isFetchingNextPage: isFetchingDailyPokemonPage,
+    hasNextPage: hasNextDailyPokemonPage
+  } = trpc.pokemons.getDailyRanking.useInfiniteQuery(
+    {
+      take: 30
+    },
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor
+    }
+  )
+
   const [leaderboardTimeSpan, setLeaderBoardTimeSpan] =
     useState<LeaderboardTimeSpan>("allTime")
 
-  if (isLoadingAllTimePokemons || isLoadingWeeklyPokemons) {
+  if (
+    isLoadingAllTimePokemons ||
+    isLoadingWeeklyPokemons ||
+    isLoadingDailyPokemons
+  ) {
     return <RingSpinner />
   }
 
@@ -56,16 +77,21 @@ export default function Leaderboard() {
     return error.message
   }
 
-  if (!weeklyData) {
+  if (!weeklyData || !dailyData) {
     return "No weekly data"
   }
 
-  let tableData: AllTimeLeaderboardPokemons | WeeklyLeaderboardPokemons = []
+  let tableData:
+    | AllTimeLeaderboardPokemons
+    | WeeklyLeaderboardPokemons
+    | DailyLeaderboardPokemons = []
 
   if (leaderboardTimeSpan === "allTime") {
     tableData = allTimeData.pages.flatMap((page) => page.pokemons)
   } else if (leaderboardTimeSpan === "week") {
     tableData = weeklyData.pages.flatMap((page) => page.pokemons)
+  } else if (leaderboardTimeSpan === "today") {
+    tableData = dailyData.pages.flatMap((page) => page.pokemons)
   }
 
   return (
@@ -104,7 +130,8 @@ export default function Leaderboard() {
                 (
                   pokemon:
                     | AllTimeLeaderboardPokemons[number]
-                    | WeeklyLeaderboardPokemons[number],
+                    | WeeklyLeaderboardPokemons[number]
+                    | DailyLeaderboardPokemons[number],
                   i
                 ) => (
                   <tr
@@ -130,7 +157,8 @@ export default function Leaderboard() {
                         </p>
                       </div>
                     </td>
-                    {leaderboardTimeSpan === "week" ? (
+                    {leaderboardTimeSpan === "week" ||
+                    leaderboardTimeSpan === "today" ? (
                       <td className="text-sm font-light text-slate-400">
                         {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
                         {/* @ts-ignore */}
@@ -157,6 +185,9 @@ export default function Leaderboard() {
             isFetchingWeeklyPokemonPage={isFetchingWeeklyPokemonPage}
             hasNextWeeklyPokemonPage={Boolean(hasNextWeeklyPokemonPage)}
             leaderboardTimeSpan={leaderboardTimeSpan}
+            fetchNextDailyPokemonPage={fetchNextDailyPokemonPage}
+            isFetchingDailyPokemonPage={isFetchingDailyPokemonPage}
+            hasNextDailyPokemonPage={Boolean(hasNextDailyPokemonPage)}
           />
         </>
       )}
@@ -203,6 +234,11 @@ interface HasMorePokemonButtonProps {
   isFetchingWeeklyPokemonPage: boolean
   hasNextWeeklyPokemonPage: boolean
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fetchNextDailyPokemonPage: any
+  isFetchingDailyPokemonPage: boolean
+  hasNextDailyPokemonPage: boolean
+
   leaderboardTimeSpan: LeaderboardTimeSpan
 }
 
@@ -213,6 +249,9 @@ function HasMorePokemonButton({
   fetchNextWeeklyPokemonPage,
   isFetchingWeeklyPokemonPage,
   hasNextWeeklyPokemonPage,
+  fetchNextDailyPokemonPage,
+  isFetchingDailyPokemonPage,
+  hasNextDailyPokemonPage,
   leaderboardTimeSpan
 }: HasMorePokemonButtonProps) {
   if (leaderboardTimeSpan === "allTime" && hasNextAllTimePokemonPage) {
@@ -238,6 +277,21 @@ function HasMorePokemonButton({
           // eslint-disable-next-line @typescript-eslint/no-unsafe-call
           onClick={() => void fetchNextWeeklyPokemonPage()}
           isLoading={isFetchingWeeklyPokemonPage}
+          className="mt-4 mb-8 w-full"
+          fullWidth
+        >
+          Fetch Next 30 Pokemon
+        </Button>
+      </div>
+    )
+  } else if (leaderboardTimeSpan === "today" && hasNextDailyPokemonPage) {
+    return (
+      <div className="flex items-center justify-center">
+        <Button
+          variant="secondary"
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+          onClick={() => void fetchNextDailyPokemonPage()}
+          isLoading={isFetchingDailyPokemonPage}
           className="mt-4 mb-8 w-full"
           fullWidth
         >

@@ -16,6 +16,13 @@ const redis = new Redis({
   token: env.UPSTASH_REDIS_REST_TOKEN
 })
 
+const getWeeklyRankingInput = z.object({
+  take: z.number().min(1).max(150).nullish(),
+  cursor: z.number().nullish()
+})
+
+type GetWeeklyRankingInput = z.infer<typeof getWeeklyRankingInput>
+
 export const pokemonRouter = createTRPCRouter({
   all: publicProcedure.query(async () => {
     const pokemons = await prisma.pokemon.findMany({
@@ -176,74 +183,152 @@ export const pokemonRouter = createTRPCRouter({
     })
   }),
   getWeeklyRanking: publicProcedure
-    .input(
-      z.object({
-        take: z.number().min(1).max(150).nullish(),
-        cursor: z.number().nullish()
-      })
-    )
+    .input(getWeeklyRankingInput)
     .query(async ({ input }) => {
-      const limit = input.take ?? 30
-      const d = new Date()
-      d.setDate(d.getDate() - 7)
-      const votes = await prisma.vote.findMany({
-        where: {
-          votedAt: {
-            gte: new Date(d.getMilliseconds()),
-            lte: new Date()
-          }
-        }
-      })
-      const pokemonIdToVotes: Record<string, number> = {}
-      const pokemonInPastWeekLeaderboard: number[] = []
-
-      for (const v of votes) {
-        const idFor = String(v.voteFor)
-        if (!(v.voteFor in pokemonIdToVotes)) {
-          pokemonIdToVotes[idFor] = 1
-          pokemonInPastWeekLeaderboard.push(v.voteFor)
-        } else {
-          pokemonIdToVotes[idFor] += 1
-        }
-        const idAgainst = String(v.voteAgainst)
-        if (!(v.voteAgainst in pokemonIdToVotes)) {
-          pokemonIdToVotes[idAgainst] = -1
-          pokemonInPastWeekLeaderboard.push(v.voteAgainst)
-        } else {
-          pokemonIdToVotes[idAgainst] -= 1
-        }
-      }
-
-      const pokemonInWeeklyLeaderboard = await prisma.pokemon.findMany({
-        where: {
-          id: {
-            in: pokemonInPastWeekLeaderboard
-          }
-        },
-        take: limit + 1,
-        orderBy: [
-          {
-            ranking: "desc"
-          }
-        ],
-        cursor: input?.cursor ? { id: input.cursor } : undefined
-      })
-
-      let nextCursor = undefined
-      if (pokemonInWeeklyLeaderboard.length > limit) {
-        const nextPokemonCursor = pokemonInWeeklyLeaderboard.pop()
-        nextCursor = nextPokemonCursor?.id
-      }
-
-      return {
-        pokemons: pokemonInWeeklyLeaderboard.map((p) => ({
-          ...p,
-          aggregateVotes: pokemonIdToVotes[p.id]
-        })),
-        nextCursor
-      }
+      return getWeeklyRankingController(input)
+    }),
+  getDailyRanking: publicProcedure
+    .input(getWeeklyRankingInput)
+    .query(async ({ input }) => {
+      debugger
+      return getDailyRankingController(input)
     })
 })
+
+async function getDailyRankingController(input: GetWeeklyRankingInput) {
+  const limit = input.take ?? 30
+  const d = new Date()
+  d.setDate(d.getDate() - 1)
+
+  const gte = new Date(d.getMilliseconds())
+  const lte = new Date()
+  console.log("d value daily", d)
+  const votes = await prisma.vote.findMany({
+    where: {
+      votedAt: {
+        gte,
+        lte
+      }
+    }
+  })
+
+  // console.log("votes", votes)
+
+  const pokemonIdToVotes: Record<string, number> = {}
+  const pokemonInPastWeekLeaderboard: number[] = []
+
+  for (const v of votes) {
+    const idFor = String(v.voteFor)
+    if (!(v.voteFor in pokemonIdToVotes)) {
+      pokemonIdToVotes[idFor] = 1
+      pokemonInPastWeekLeaderboard.push(v.voteFor)
+    } else {
+      pokemonIdToVotes[idFor] += 1
+    }
+    const idAgainst = String(v.voteAgainst)
+    if (!(v.voteAgainst in pokemonIdToVotes)) {
+      pokemonIdToVotes[idAgainst] = -1
+      pokemonInPastWeekLeaderboard.push(v.voteAgainst)
+    } else {
+      pokemonIdToVotes[idAgainst] -= 1
+    }
+  }
+
+  const pokemonInWeeklyLeaderboard = await prisma.pokemon.findMany({
+    where: {
+      id: {
+        in: pokemonInPastWeekLeaderboard
+      }
+    },
+    take: limit + 1,
+    orderBy: [
+      {
+        ranking: "desc"
+      }
+    ],
+    cursor: input?.cursor ? { id: input.cursor } : undefined
+  })
+
+  let nextCursor = undefined
+  if (pokemonInWeeklyLeaderboard.length > limit) {
+    const nextPokemonCursor = pokemonInWeeklyLeaderboard.pop()
+    nextCursor = nextPokemonCursor?.id
+  }
+
+  return {
+    pokemons: pokemonInWeeklyLeaderboard.map((p) => ({
+      ...p,
+      aggregateVotes: pokemonIdToVotes[p.id]
+    })),
+    nextCursor
+  }
+}
+
+async function getWeeklyRankingController(input: GetWeeklyRankingInput) {
+  const limit = input.take ?? 30
+  const d = new Date()
+  d.setDate(d.getDate() - 7)
+  console.log("d value weekly", d)
+  const votes = await prisma.vote.findMany({
+    where: {
+      votedAt: {
+        gte: new Date(d.getMilliseconds()),
+        lte: new Date()
+      }
+    }
+  })
+
+  // console.log("votes", votes)
+
+  const pokemonIdToVotes: Record<string, number> = {}
+  const pokemonInPastWeekLeaderboard: number[] = []
+
+  for (const v of votes) {
+    const idFor = String(v.voteFor)
+    if (!(v.voteFor in pokemonIdToVotes)) {
+      pokemonIdToVotes[idFor] = 1
+      pokemonInPastWeekLeaderboard.push(v.voteFor)
+    } else {
+      pokemonIdToVotes[idFor] += 1
+    }
+    const idAgainst = String(v.voteAgainst)
+    if (!(v.voteAgainst in pokemonIdToVotes)) {
+      pokemonIdToVotes[idAgainst] = -1
+      pokemonInPastWeekLeaderboard.push(v.voteAgainst)
+    } else {
+      pokemonIdToVotes[idAgainst] -= 1
+    }
+  }
+
+  const pokemonInWeeklyLeaderboard = await prisma.pokemon.findMany({
+    where: {
+      id: {
+        in: pokemonInPastWeekLeaderboard
+      }
+    },
+    take: limit + 1,
+    orderBy: [
+      {
+        ranking: "desc"
+      }
+    ],
+    cursor: input?.cursor ? { id: input.cursor } : undefined
+  })
+
+  let nextCursor = undefined
+  if (pokemonInWeeklyLeaderboard.length > limit) {
+    const nextPokemonCursor = pokemonInWeeklyLeaderboard.pop()
+    nextCursor = nextPokemonCursor?.id
+  }
+
+  return {
+    pokemons: pokemonInWeeklyLeaderboard.map((p) => ({
+      ...p,
+      aggregateVotes: pokemonIdToVotes[p.id]
+    })),
+    nextCursor
+  }
+}
 
 function expectedProbabilityOfWinning(ratingA: number, ratingB: number) {
   return (
